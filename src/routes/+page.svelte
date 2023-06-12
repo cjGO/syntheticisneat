@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import * as d3 from 'd3';
 
-  let data = Array.from({length: 5}, () => ({
+  let data = Array.from({length: 200}, () => ({
     pc1: Math.random() * 100,
     pc2: Math.random() * 100,
     pc3: Math.random() * 100
@@ -66,6 +66,14 @@
       console.log('mouseup', selectedPoints);
     });
   });
+
+  function updateXData(event) {
+    x_data = event.target.value;
+  }
+
+  function updateYData(event) {
+    y_data = event.target.value;
+  }     
 </script>
 
 <style>
@@ -96,3 +104,33 @@
     />
   </g>
 </svg>
+
+<!-- Add radio buttons for X axis -->
+<h3>X axis:</h3>
+{#each ['pc1', 'pc2', 'pc3'] as pc}
+  <label>
+    <input
+      type="radio"
+      name="x_data"
+      value="{pc}"
+      on:change="{updateXData}"
+      checked="{pc === x_data}"
+    />
+    {pc}
+  </label>
+{/each}
+
+<!-- Add radio buttons for Y axis -->
+<h3>Y axis:</h3>
+{#each ['pc1', 'pc2', 'pc3'] as pc}
+  <label>
+    <input
+      type="radio"
+      name="y_data"
+      value="{pc}"
+      on:change="{updateYData}"
+      checked="{pc === y_data}"
+    />
+    {pc}
+  </label>
+{/each}
