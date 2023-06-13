@@ -1,152 +1,34 @@
 <script>
 	import { onMount } from 'svelte';
-	import * as d3 from 'd3';
-	import { tweened } from 'svelte/motion';
-	import DataPoint from './DataPoint.svelte';
+	import Scatterplot from './Scatterplot.svelte';
 
-	let data = Array.from({ length: 200 }, () => {
-		const point = {
-			pc1: Math.random() * 100,
-			pc2: Math.random() * 100,
-			pc3: Math.random() * 100
-		};
-		return {
-			...point,
-			x: tweened(0, { duration: 500 }),
-			y: tweened(0, { duration: 500 })
-		};
+  let protein_umap; 
+
+	let isLoading = true; // reactive variable to track loading state
+
+	onMount(async () => {
+		try {
+			const response = await fetch('http://3.91.217.55:8004/all_protein_umaps');
+			protein_umap = await response.json();
+		} catch (error) {
+			console.error('Failed to fetch data:', error);
+		} finally {
+      console.log(protein_umap)
+			isLoading = false; // update the loading state when the request completes
+		}
 	});
-
-	let x_data = 'pc1';
-	let y_data = 'pc2';
-
-	const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-	const width = 500 - margin.left - margin.right;
-	const height = 500 - margin.top - margin.bottom;
-
-	$: xScale = d3
-		.scaleLinear()
-		.domain(d3.extent(data, (d) => d[x_data]))
-		.range([0, width]);
-
-	$: yScale = d3
-		.scaleLinear()
-		.domain(d3.extent(data, (d) => d[y_data]))
-		.range([height, 0]);
-
-	$: {
-		xScale.domain(d3.extent(data, (d) => d[x_data])).nice();
-		yScale.domain(d3.extent(data, (d) => d[y_data])).nice();
-		updateDataPoints();
-	}
-
-	let svg;
-	let origin = { x: 0, y: 0 };
-	let selectionRect = { x: 0, y: 0, width: 0, height: 0 };
-	let isSelecting = false;
-
-	let selectedPoints = [];
-
-	onMount(() => {
-		d3.select(svg).on('mousedown', function (event) {
-			const [x, y] = d3.pointer(event, this);
-			origin.x = x;
-			origin.y = y;
-			isSelecting = true;
-			// Reset the previous rectangle selection
-			selectionRect.width = 0;
-			selectionRect.height = 0;
-			console.log('mousedown', x, y);
-		});
-
-		window.addEventListener('mousemove', function (event) {
-			if (!isSelecting) return;
-			const [x, y] = d3.pointer(event, svg);
-			selectionRect.x = Math.min(origin.x, x);
-			selectionRect.y = Math.min(origin.y, y);
-			selectionRect.width = Math.abs(x - origin.x);
-			selectionRect.height = Math.abs(y - origin.y);
-			console.log('mousemove', x, y);
-		});
-
-		window.addEventListener('mouseup', function (event) {
-			if (!isSelecting) return;
-			isSelecting = false;
-			// Compute the list of selected points
-			selectedPoints = data.filter(
-				(d) =>
-					xScale(d[x_data]) > selectionRect.x &&
-					xScale(d[x_data]) < selectionRect.x + selectionRect.width &&
-					yScale(d[y_data]) > selectionRect.y &&
-					yScale(d[y_data]) < selectionRect.y + selectionRect.height
-			);
-			console.log('mouseup', selectedPoints);
-		});
-	});
-	function updateDataPoints() {
-		data.forEach((d) => {
-			d.x.set(xScale(d[x_data]));
-			d.y.set(yScale(d[y_data]));
-		});
-	}
-
-	function updateXData(event) {
-		x_data = event.target.value;
-		data.forEach((d) => {
-			d.x.set(xScale(d[x_data]));
-		});
-	}
-
-	function updateYData(event) {
-		y_data = event.target.value;
-		data.forEach((d) => {
-			d.y.set(yScale(d[y_data]));
-		});
-	}
 </script>
 
-<svg
-	bind:this={svg}
-	width={width + margin.left + margin.right}
-	height={height + margin.top + margin.bottom}
->
-	<g transform="translate({margin.left}, {margin.top})">
-		{#each data as point (point.pc1)}
-			<DataPoint x={point.x} y={point.y} selected={selectedPoints.includes(point)} />
-		{/each}
-		<rect
-			x={selectionRect.x}
-			y={selectionRect.y}
-			width={selectionRect.width}
-			height={selectionRect.height}
-			fill="rgba(0, 0, 255, 0.2)"
-			stroke="blue"
-			stroke-width="1"
-			style="display: {isSelecting ? 'block' : 'none'}"
-		/>
-	</g>
-</svg>
+Test
 
-<!-- Add radio buttons for X axis -->
-<h3>X axis:</h3>
-{#each ['pc1', 'pc2', 'pc3'] as pc}
-	<label>
-		<input type="radio" name="x_data" value={pc} on:change={updateXData} checked={pc === x_data} />
-		{pc}
-	</label>
-{/each}
+{#if isLoading}
+	<p>Loading...</p>
+{:else if protein_umap.length === 0}
+	<p>No data available.</p>
+{/if}
 
-<!-- Add radio buttons for Y axis -->
-<h3>Y axis:</h3>
-{#each ['pc1', 'pc2', 'pc3'] as pc}
-	<label>
-		<input type="radio" name="y_data" value={pc} on:change={updateYData} checked={pc === y_data} />
-		{pc}
-	</label>
-{/each}
+{#if protein_umap}
+<Scatterplot data={protein_umap}/>
+{/if}
 
-<style>
-	rect {
-		pointer-events: none;
-	}
-</style>
+<br />
