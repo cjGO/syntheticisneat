@@ -8,7 +8,7 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch('http://3.91.217.55:8004/all_protein_umaps');
+			const response = await fetch('https://api.syntheticisneat.com/all_protein_umaps');
 			protein_umap = await response.json();
 		} catch (error) {
 			console.error('Failed to fetch data:', error);
