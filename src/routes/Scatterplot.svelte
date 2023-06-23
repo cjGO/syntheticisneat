@@ -3,7 +3,7 @@
 	import * as d3 from 'd3';
 	import { tweened } from 'svelte/motion';
 	import DataPoint from './DataPoint.svelte';
-
+  import RadioButtons from '../components/RadioButtons.svelte';
 	export let data;
 
 	// Transform the data for the scatter plot
@@ -15,6 +15,8 @@
 
 	let x_data = 'umap_component1';
 	let y_data = 'umap_component2';
+
+	let options = ['umap_component1', 'umap_component2', 'umap_component3', 'umap_component4'];
 
 	const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 	const width = 500 - margin.left - margin.right;
@@ -123,23 +125,10 @@
 	</g>
 </svg>
 
-<!-- Add radio buttons for X axis -->
-<h3>X axis:</h3>
-{#each ['umap_component1', 'umap_component2', 'umap_component3','umap_component4'] as pc}
-	<label>
-		<input type="radio" name="x_data" value={pc} on:change={updateXData} checked={pc === x_data} />
-		{pc}
-	</label>
-{/each}
 
-<!-- Add radio buttons for Y axis -->
-<h3>Y axis:</h3>
-{#each ['umap_component1', 'umap_component2', 'umap_component3','umap_component4'] as pc}
-	<label>
-		<input type="radio" name="y_data" value={pc} on:change={updateYData} checked={pc === y_data} />
-		{pc}
-	</label>
-{/each}
+
+<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} onChange: updateXData />
+<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} onChange: updateYData />
 
 <style>
 	rect {
