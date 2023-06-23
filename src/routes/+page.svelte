@@ -19,8 +19,6 @@
 	});
 </script>
 
-Test
-
 {#if isLoading}
 	<p>Loading...</p>
 {:else if protein_umap.length === 0}
