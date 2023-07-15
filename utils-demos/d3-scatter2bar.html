@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scatter Points within Bar</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+  </head>
+  <body>
+    <svg id="scatterPlot" width="800" height="600"></svg>
+    <script>
+      let svg = d3.select("#scatterPlot");
+
+      let barWidth = 100; // Adjust to your needs
+      let barHeight = 300; // Adjust to your needs
+      let numPoints = 200; // Number of points to scatter within the bar
+      let noiseFactor = 0.9; // Determines the amount of noise, adjust to your preference
+
+      let bar = svg
+        .append("rect")
+        .attr("x", 50)
+        .attr("y", 50)
+        .attr("width", barWidth)
+        .attr("height", barHeight)
+        .style("fill", "#ccc"); // Some color
+
+      let points = [];
+      let sqrtNumPoints = Math.round(Math.sqrt(numPoints));
+      let deltaX = barWidth / sqrtNumPoints;
+      let deltaY = barHeight / sqrtNumPoints;
+
+      for (let i = 0; i < sqrtNumPoints; i++) {
+        for (let j = 0; j < sqrtNumPoints; j++) {
+          points.push({
+            x:
+              50 +
+              deltaX / 2 +
+              i * deltaX +
+              (Math.random() - 0.5) * noiseFactor * deltaX,
+            y:
+              50 +
+              deltaY / 2 +
+              j * deltaY +
+              (Math.random() - 0.5) * noiseFactor * deltaY,
+          });
+        }
+      }
+
+      svg
+        .selectAll("circle") // select all circle elements (which don't exist yet)
+        .data(points) // bind our points data
+        .enter() // for each point that doesn't yet have a corresponding circle...
+        .append("circle") // append a new circle element
+        .attr("cx", (d) => d.x) // set the circle's x position
+        .attr("cy", (d) => d.y) // set the circle's y position
+        .attr("r", 2) // set the circle's radius
+        .style("fill", "blue"); // set the circle's color
+    </script>
+  </body>
+</html>
