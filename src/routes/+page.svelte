@@ -1,13 +1,19 @@
 <script>
 	import { onMount } from 'svelte';
 	import Scatterplot from './Scatterplot.svelte';
-	import { selectedPoint } from './stores';
+	import AAscatter from './AAscatter.svelte';
+	import { selectedPoint, hoveredPoint } from './stores';
 	import { transformData, runUMAP } from '../lib/helpers';
-
+	import HoveredData from './HoveredData.svelte';
 	let protein_umap;
 	let protein_meta;
 	let isLoading = true;
 
+	let hoveredDatapoint = null;
+
+	hoveredPoint.subscribe((value) => {
+		hoveredDatapoint = value;
+	});
 	// pull all data to be visualized
 	onMount(async () => {
 		try {
@@ -59,12 +65,32 @@
 	<p>No data available.</p>
 {/if}
 
-{#if protein_umap}
-	<Scatterplot data={protein_umap} />
-{/if}
+<div class="container">
+	{#if protein_umap}
+		<div class="scatterplot">
+			<Scatterplot data={protein_umap} meta={protein_meta} />
+		</div>
+	{/if}
 
-{#if protein_umap && selectedPoint}
-	<button on:click={runUMAP(selected_protein)}>Run UMAP</button>
+	{#if hoveredDatapoint}
+		<div class="hovered-data">
+			<HoveredData data={protein_meta[hoveredDatapoint]} />
+		</div>
+	{/if}
+</div>
+
+<button on:click={() => (selected_protein = runUMAP(selected_protein))}>Run UMAP</button>
+
+{#if Array.isArray(selected_protein) && selected_protein.length > 0 && selected_protein[0].hasOwnProperty('umap_component1')}
+	<AAscatter data={selected_protein} />
 {/if}
 
 <br />
+
+<style>
+	.container {
+		display: grid;
+		grid-template-columns: 1fr 1fr; /* This will create two columns of equal width */
+		gap: 1em; /* Add some space between the components */
+	}
+</style>

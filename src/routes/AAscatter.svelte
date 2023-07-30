@@ -3,20 +3,18 @@
 	import * as d3 from 'd3';
 	import { tweened } from 'svelte/motion';
 	import { writable } from 'svelte/store';
-	import DataPoint from './DataPoint.svelte';
+	import AaDataPoint from './AaDataPoint.svelte';
 	import RadioButtons from '../components/RadioButtons.svelte';
 	import { selectedPoint } from './stores';
 	export let data;
-	export let meta;
+	import { runUMAP } from '../lib/helpers';
+	import { hoveredAminoAcidStore } from './aa_store';
 
-	import { createEventDispatcher } from 'svelte';
-	import { hoveredPoint } from './stores';
-	const dispatch = createEventDispatcher();
+	let hoveredAminoAcid = null;
 
-	function handleMouseOver(datapoint) {
-		dispatch('datapointHover', { datapoint });
-		hoveredPoint.set(datapoint);
-	}
+	hoveredAminoAcidStore.subscribe((value) => {
+		hoveredAminoAcid = value;
+	});
 
 	const zoomTransform = writable({ x: 0, y: 0, k: 1 });
 
@@ -42,10 +40,9 @@
 		y: tweened(0, { duration: 2000 })
 	}));
 
-	let x_data = 'umap_component1';
-	let y_data = 'umap_component2';
-	let meta_pick = 'species_name';
-	let options = ['umap_component1', 'umap_component2', 'umap_component3', 'umap_component4'];
+	let x_data = 'umap_component0';
+	let y_data = 'umap_component1';
+
 	const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 	const width = 500 - margin.left - margin.right;
 	const height = 500 - margin.top - margin.bottom;
@@ -72,15 +69,6 @@
 	let svg;
 
 	let currentPoint = null;
-
-	// Subscribe to changes in the selectedPoint store.
-	// Whenever the store's value changes, update the currentPoint variable.
-	function handlePointClick(index) {
-		// Update the store's value. If the current value is the same as the clicked index,
-		// set the store's value to null. Otherwise, set it to the clicked index.
-		selectedPoint.update((prevIndex) => (prevIndex === index ? null : index));
-		console.log(selectedPoint);
-	}
 </script>
 
 <svg
@@ -93,21 +81,7 @@
 		style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
 	>
 		{#each data as point, index (index)}
-			<DataPoint
-				x={point.x}
-				y={point.y}
-				selected={$selectedPoint === index}
-				on:click={() => handlePointClick(index)}
-				on:mouseover={() => handleMouseOver(index)}
-			/>
+			<AaDataPoint x={point.x} y={point.y} amino_acid={point.amino_acid} binding={point.binding} />
 		{/each}
 	</g>
 </svg>
-
-<!-- <RadioButtons
-	label={'Meta'}
-	options={['species_name', 'biological_process']}
-	bind:selectedOption={meta_pick}
-/> -->
-<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} />
-<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} />

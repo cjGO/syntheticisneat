@@ -26,12 +26,20 @@ export function transformData(array) {
 
 
 export let runUMAP = (selected_protein) => {
-  if (!selected_protein) {
-    console.log('No protein selected');
-    return;
-  }
 
   let umap = new UMAP();
-  let embedding = umap.fit(selected_protein);
-  console.log(embedding);
+  console.log(selected_protein)
+  // Extract the 'embedding' property from each object in the selected_protein array
+  let embeddings = selected_protein.map(protein => protein.embeddings);
+  console.log(embeddings)
+
+  let embedding = umap.fit(embeddings);
+
+  // Iterate over the selected_protein array and add the UMAP components to each object
+  selected_protein = selected_protein.map((protein, i) => {
+    return {...protein, umap_component0: embedding[i][0], umap_component1: embedding[i][1]};
+  });
+
+  console.log(selected_protein);
+  return selected_protein;
 };
