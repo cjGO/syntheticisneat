@@ -28,8 +28,8 @@
 	// Transform the data for the scatter plot
 	data = data.map((point) => ({
 		...point,
-		x: tweened(0, { duration: 1000 }),
-		y: tweened(0, { duration: 1000 })
+		x: tweened(0, { duration: 2000 }),
+		y: tweened(0, { duration: 2000 })
 	}));
 
 	let x_data = 'umap_component1';

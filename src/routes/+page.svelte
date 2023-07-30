@@ -2,29 +2,30 @@
 	import { onMount } from 'svelte';
 	import Scatterplot from './Scatterplot.svelte';
 	import { selectedPoint } from './stores';
+	import { transformData, runUMAP } from '../lib/helpers';
 
 	let protein_umap;
-let protein_meta;
-let isLoading = true;
+	let protein_meta;
+	let isLoading = true;
 
-onMount(async () => {
-	try {
-		const [response1, response2] = await Promise.all([
-			fetch('https://api.syntheticisneat.com/all_protein_umaps'),
-			fetch('https://api.syntheticisneat.com/proteins/')
-		]);
+	// pull all data to be visualized
+	onMount(async () => {
+		try {
+			const [response1, response2] = await Promise.all([
+				fetch('https://api.syntheticisneat.com/all_protein_umaps'),
+				fetch('https://api.syntheticisneat.com/proteins/')
+			]);
 
-		protein_umap = await response1.json();
-		protein_meta = await response2.json();
-
-	} catch (error) {
-		console.error('Failed to fetch data:', error);
-	} finally {
-		console.log(protein_umap);
-		console.log(protein_meta)
-		isLoading = false; // update the loading state when the request completes
-	}
-});
+			protein_umap = await response1.json();
+			protein_meta = await response2.json();
+		} catch (error) {
+			console.error('Failed to fetch data:', error);
+		} finally {
+			console.log(protein_umap);
+			console.log(protein_meta);
+			isLoading = false; // update the loading state when the request completes
+		}
+	});
 
 	// Create a local variable to hold the current value of the store.
 	let currentPoint;
@@ -44,7 +45,7 @@ onMount(async () => {
 			.then((response) => response.json())
 			.then((data) => {
 				selected_protein = data;
-				console.log(selected_protein);
+				console.log(transformData(selected_protein));
 			})
 			.catch((error) => {
 				console.error('Error:', error);
@@ -63,7 +64,7 @@ onMount(async () => {
 {/if}
 
 {#if protein_umap && selectedPoint}
-	{[currentPoint]}
+	<button on:click={runUMAP(selected_protein)}>Run UMAP</button>
 {/if}
 
 <br />
