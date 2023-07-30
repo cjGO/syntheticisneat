@@ -4,24 +4,27 @@
 	import { selectedPoint } from './stores';
 
 	let protein_umap;
+let protein_meta;
+let isLoading = true;
 
-	let isLoading = true; // reactive variable to track loading state
+onMount(async () => {
+	try {
+		const [response1, response2] = await Promise.all([
+			fetch('https://api.syntheticisneat.com/all_protein_umaps'),
+			fetch('https://api.syntheticisneat.com/proteins/')
+		]);
 
-	onMount(async () => {
-		try {
-			const response = await fetch('https://api.syntheticisneat.com/all_protein_umaps');
-			const response2 = await fetch('https://api.syntheticisneat.com/proteins')
-			protein_umap = await response.json();
-			protein_meta = await response2.json()
-			
-		} catch (error) {
-			console.error('Failed to fetch data:', error);
-		} finally {
-			console.log(protein_umap);
-			console.log(protein_meta)
-			isLoading = false; // update the loading state when the request completes
-		}
-	});
+		protein_umap = await response1.json();
+		protein_meta = await response2.json();
+
+	} catch (error) {
+		console.error('Failed to fetch data:', error);
+	} finally {
+		console.log(protein_umap);
+		console.log(protein_meta)
+		isLoading = false; // update the loading state when the request completes
+	}
+});
 
 	// Create a local variable to hold the current value of the store.
 	let currentPoint;
