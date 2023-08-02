@@ -2,9 +2,12 @@
 	import { onMount } from 'svelte';
 	import Scatterplot from './Scatterplot.svelte';
 	import AAscatter from './AAscatter.svelte';
-	import { selectedPoint, hoveredPoint } from './stores';
+	import { selectedPoint, hoveredPoint, selectedProtein, selectedAminoAcids } from './stores';
 	import { transformData, runUMAP } from '../lib/helpers';
 	import HoveredData from './HoveredData.svelte';
+	import StringSpan from '../components/StringSpan.svelte';
+	import Highlighter from '../components/Highlighter.svelte';
+
 	let protein_umap;
 	let protein_meta;
 	let isLoading = true;
@@ -51,7 +54,7 @@
 			.then((response) => response.json())
 			.then((data) => {
 				selected_protein = data;
-				console.log(transformData(selected_protein));
+				$selectedProtein = protein_umap[currentPoint];
 			})
 			.catch((error) => {
 				console.error('Error:', error);
@@ -59,6 +62,9 @@
 	}
 </script>
 
+<div style="width: 25%; height: 10; overflow: auto;">
+	<Highlighter />
+</div>
 {#if isLoading}
 	<p>Loading...</p>
 {:else if protein_umap.length === 0}
@@ -86,6 +92,8 @@
 {/if}
 
 <br />
+
+<StringSpan />
 
 <style>
 	.container {
