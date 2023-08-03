@@ -13,7 +13,7 @@
 		intervalId = setInterval(() => {
 			let randomOption = options[Math.floor(Math.random() * options.length)];
 			handleChange(randomOption);
-		}, 2000);
+		}, 5000);
 	}
 
 	function stopRandomSelect() {

@@ -49,12 +49,13 @@
 	let previousPoint = null;
 	$: if (currentPoint !== null && currentPoint !== previousPoint) {
 		previousPoint = currentPoint;
-		let protein_id = protein_umap[currentPoint].id;
-		fetch(`https://api.syntheticisneat.com/amino_acids/${protein_id}`)
+		$selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
+		console.log({ protein_id: $selectedProtein.id });
+		fetch(`https://api.syntheticisneat.com/amino_acids/${$selectedProtein.id}`)
 			.then((response) => response.json())
 			.then((data) => {
 				selected_protein = transformData(data);
-				$selectedProtein = protein_meta[currentPoint];
+				console.log(selectedProtein);
 			})
 			.catch((error) => {
 				console.error('Error:', error);
@@ -62,12 +63,9 @@
 	}
 
 	$: {
-		console.log({ hoveredDataPoint: hoveredDatapoint });
+		console.log({ selectedProteinStore: $selectedProtein });
 	}
 </script>
-
-<pre>{JSON.stringify($selectedProtein, null, 2)}</pre>
-<pre>{JSON.stringify(hoveredPoint)}</pre>
 
 <!-- <div style="width: 25%; height: 10; overflow: auto;">
 	<Highlighter />
@@ -98,7 +96,7 @@
 	on:click={() => {
 		// console.log('runumap');
 		selected_protein = runUMAP(selected_protein);
-		console.log(selected_protein);
+		console.log({ 'selected protein from UMAP button': selected_protein });
 	}}>Run UMAP</button
 >
 <div class="container">

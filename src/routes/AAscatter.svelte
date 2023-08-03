@@ -81,7 +81,13 @@
 		style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
 	>
 		{#each data as point, index (index)}
-			<AaDataPoint x={point.x} y={point.y} amino_acid={point.amino_acid} binding={point.binding} />
+			<AaDataPoint
+				{index}
+				x={point.x}
+				y={point.y}
+				amino_acid={point.amino_acid}
+				binding={point.binding}
+			/>
 		{/each}
 	</g>
 </svg>
