@@ -93,13 +93,7 @@
 		style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
 	>
 		{#each data as point, index (index)}
-			<DataPoint
-				x={point.x}
-				y={point.y}
-				selected={$selectedPoint === index}
-				on:click={() => handlePointClick(index)}
-				on:mouseover={() => handleMouseOver(index)}
-			/>
+			<DataPoint x={point.x} y={point.y} {index} />
 		{/each}
 	</g>
 </svg>

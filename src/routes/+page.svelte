@@ -49,22 +49,30 @@
 	let previousPoint = null;
 	$: if (currentPoint !== null && currentPoint !== previousPoint) {
 		previousPoint = currentPoint;
-		let protein_id = protein_umap[currentPoint].protein_id;
+		let protein_id = protein_umap[currentPoint].id;
 		fetch(`https://api.syntheticisneat.com/amino_acids/${protein_id}`)
 			.then((response) => response.json())
 			.then((data) => {
-				selected_protein = data;
-				$selectedProtein = protein_umap[currentPoint];
+				selected_protein = transformData(data);
+				$selectedProtein = protein_meta[currentPoint];
 			})
 			.catch((error) => {
 				console.error('Error:', error);
 			});
 	}
+
+	$: {
+		console.log({ hoveredDataPoint: hoveredDatapoint });
+	}
 </script>
 
-<div style="width: 25%; height: 10; overflow: auto;">
+<pre>{JSON.stringify($selectedProtein, null, 2)}</pre>
+<pre>{JSON.stringify(hoveredPoint)}</pre>
+
+<!-- <div style="width: 25%; height: 10; overflow: auto;">
 	<Highlighter />
-</div>
+</div> -->
+
 {#if isLoading}
 	<p>Loading...</p>
 {:else if protein_umap.length === 0}
@@ -78,15 +86,21 @@
 		</div>
 	{/if}
 
-	{#if hoveredDatapoint}
+	{#if $selectedProtein}
 		<div class="hovered-data">
-			<HoveredData data={protein_meta[hoveredDatapoint]} />
+			<HoveredData data={$selectedProtein} />
+			<HoveredData data={protein_meta[$hoveredPoint]} />
 		</div>
 	{/if}
 </div>
 
-<button on:click={() => (selected_protein = runUMAP(selected_protein))}>Run UMAP</button>
-
+<button
+	on:click={() => {
+		// console.log('runumap');
+		selected_protein = runUMAP(selected_protein);
+		console.log(selected_protein);
+	}}>Run UMAP</button
+>
 {#if Array.isArray(selected_protein) && selected_protein.length > 0 && selected_protein[0].hasOwnProperty('umap_component1')}
 	<AAscatter data={selected_protein} />
 {/if}
