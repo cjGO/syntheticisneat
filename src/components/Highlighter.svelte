@@ -29,8 +29,8 @@
 
 	// Reactive statement
 	$: {
-		if ($targetIndex !== -1 && $highlightedIndex === -1) {
-			$highlightedIndex = $targetIndex;
+		if ($targetIndex !== -1) {
+			moveHighlight();
 		}
 	}
 </script>

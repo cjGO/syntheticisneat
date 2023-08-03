@@ -1,6 +1,6 @@
 <script>
 	import { createEventDispatcher } from 'svelte';
-	import { highlightedIndex, hoveredAA } from './stores';
+	import { targetIndex, highlightedIndex, hoveredAA, selectedAminoAcids } from './stores';
 
 	export let x;
 	export let y;
@@ -18,6 +18,10 @@
 
 	function handleMouseOut() {
 		hoveredAA.set(null);
+	}
+
+	function handleClick() {
+		$targetIndex = index;
 	}
 </script>
 
@@ -38,6 +42,7 @@
 			fill={binding ? 'red' : 'black'}
 			on:mouseover={handleMouseOver}
 			on:mouseout={handleMouseOut}
+			on:click={handleClick}
 		>
 			{amino_acid}
 		</text>

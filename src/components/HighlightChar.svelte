@@ -29,12 +29,16 @@
 </span>
 
 <style>
+	span {
+		border: 1px solid transparent; /* All elements have a transparent border by default */
+		box-sizing: border-box;
+	}
+
 	.highlight {
-		background-color: green;
+		border-color: blue; /* Only the border color changes on hover */
 	}
 
 	.hover {
-		border: 2px solid green;
-		box-sizing: border-box;
+		border-color: green; /* Only the border color changes on hover */
 	}
 </style>

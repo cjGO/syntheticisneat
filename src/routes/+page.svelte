@@ -111,8 +111,6 @@
 </div>
 <br />
 
-<StringSpan />
-
 <style>
 	.container {
 		display: flex;
