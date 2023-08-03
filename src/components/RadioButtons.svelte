@@ -21,6 +21,7 @@
 	}
 
 	onMount(() => {
+		randomSelect();
 		return () => {
 			if (intervalId) {
 				clearInterval(intervalId);
