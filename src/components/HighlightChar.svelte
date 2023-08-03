@@ -39,6 +39,6 @@
 	}
 
 	.hover {
-		border-color: green; /* Only the border color changes on hover */
+		border-color: lightgreen; /* Only the border color changes on hover */
 	}
 </style>
