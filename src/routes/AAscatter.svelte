@@ -42,6 +42,7 @@
 
 	let x_data = 'umap_component0';
 	let y_data = 'umap_component1';
+	let options = ['umap_component0', 'umap_component1', 'umap_component2', 'umap_component3'];
 
 	const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 	const width = 500 - margin.left - margin.right;
@@ -71,23 +72,49 @@
 	let currentPoint = null;
 </script>
 
-<svg
-	bind:this={svg}
-	width={width + margin.left + margin.right}
-	height={height + margin.top + margin.bottom}
->
-	<g
-		transform="translate({margin.left}, {margin.top})"
-		style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
+<div class="scatterplot-container">
+	<svg
+		bind:this={svg}
+		width={width + margin.left + margin.right}
+		height={height + margin.top + margin.bottom}
 	>
-		{#each data as point, index (index)}
-			<AaDataPoint
-				{index}
-				x={point.x}
-				y={point.y}
-				amino_acid={point.amino_acid}
-				binding={point.binding}
-			/>
-		{/each}
-	</g>
-</svg>
+		<g
+			transform="translate({margin.left}, {margin.top})"
+			style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
+		>
+			{#each data as point, index (index)}
+				<AaDataPoint
+					{index}
+					x={point.x}
+					y={point.y}
+					amino_acid={point.amino_acid}
+					binding={point.binding}
+				/>
+			{/each}
+		</g>
+	</svg>
+	<div class="radio-buttons">
+		<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} />
+		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} />
+	</div>
+</div>
+
+<style>
+	.scatterplot-container {
+		display: flex;
+		flex-direction: column; /* Stack children vertically */
+		height: 100%; /* Take up the full height of the parent */
+		width: 100%; /* Take up the full width of the parent */
+	}
+
+	svg {
+		width: 100%; /* This will make the SVG responsive to the width of the container */
+		height: auto; /* Height is adjusted automatically to maintain the aspect ratio */
+		flex-grow: 1;
+	}
+
+	.radio-buttons {
+		display: flex;
+		justify-content: space-between; /* Distribute RadioButtons evenly */
+	}
+</style>
