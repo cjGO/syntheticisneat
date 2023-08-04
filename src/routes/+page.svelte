@@ -2,7 +2,13 @@
 	import { onMount } from 'svelte';
 	import Scatterplot from './Scatterplot.svelte';
 	import AAscatter from './AAscatter.svelte';
-	import { selectedPoint, hoveredPoint, selectedProtein, selectedAminoAcids } from './stores';
+	import {
+		selectedPoint,
+		hoveredPoint,
+		selectedProtein,
+		highlightedIndex,
+		selectedAminoAcids
+	} from './stores';
 	import { transformData, runUMAP } from '../lib/helpers';
 	import HoveredData from './HoveredData.svelte';
 	import StringSpan from '../components/StringSpan.svelte';
@@ -106,6 +112,7 @@
 		</div>
 		<div class="highlighter">
 			<Highlighter protein_sequence={$selectedProtein.sequence} />
+			<p>{JSON.stringify(selected_protein[$highlightedIndex], null, 2)}</p>
 		</div>
 	{/if}
 </div>
