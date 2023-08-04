@@ -85,10 +85,10 @@
 	{/if}
 
 	<div class="hovered-data-container">
-		{#if $selectedProtein}
-			<HoveredData data={$selectedProtein} />
-			<HoveredData data={protein_meta[$hoveredPoint]} />
-		{/if}
+		<HoveredData data={$selectedProtein ? $selectedProtein : null} />
+		<HoveredData
+			data={protein_meta && protein_meta[$hoveredPoint] ? protein_meta[$hoveredPoint] : null}
+		/>
 	</div>
 </div>
 

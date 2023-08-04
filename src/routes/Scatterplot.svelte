@@ -70,38 +70,45 @@
 	}
 
 	let svg;
-
-	let currentPoint = null;
-
-	// Subscribe to changes in the selectedPoint store.
-	// Whenever the store's value changes, update the currentPoint variable.
-	function handlePointClick(index) {
-		// Update the store's value. If the current value is the same as the clicked index,
-		// set the store's value to null. Otherwise, set it to the clicked index.
-		selectedPoint.update((prevIndex) => (prevIndex === index ? null : index));
-		console.log(selectedPoint);
-	}
 </script>
 
-<svg
-	bind:this={svg}
-	width={width + margin.left + margin.right}
-	height={height + margin.top + margin.bottom}
->
-	<g
-		transform="translate({margin.left}, {margin.top})"
-		style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
+<div class="scatterplot-container">
+	<svg
+		bind:this={svg}
+		width={width + margin.left + margin.right}
+		height={height + margin.top + margin.bottom}
 	>
-		{#each data as point, index (index)}
-			<DataPoint x={point.x} y={point.y} {index} />
-		{/each}
-	</g>
-</svg>
+		<g
+			transform="translate({margin.left}, {margin.top})"
+			style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
+		>
+			{#each data as point, index (index)}
+				<DataPoint x={point.x} y={point.y} {index} />
+			{/each}
+		</g>
+	</svg>
+	<div class="radio-buttons">
+		<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} />
+		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} />
+	</div>
+</div>
 
-<!-- <RadioButtons
-	label={'Meta'}
-	options={['species_name', 'biological_process']}
-	bind:selectedOption={meta_pick}
-/> -->
-<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} />
-<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} />
+<style>
+	.scatterplot-container {
+		display: flex;
+		flex-direction: column; /* Stack children vertically */
+		height: 100%; /* Take up the full height of the parent */
+		width: 100%; /* Take up the full width of the parent */
+	}
+
+	svg {
+		width: 100%; /* This will make the SVG responsive to the width of the container */
+		height: auto; /* Height is adjusted automatically to maintain the aspect ratio */
+		flex-grow: 1;
+	}
+
+	.radio-buttons {
+		display: flex;
+		justify-content: space-between; /* Distribute RadioButtons evenly */
+	}
+</style>
