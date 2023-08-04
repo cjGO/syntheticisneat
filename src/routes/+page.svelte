@@ -84,12 +84,12 @@
 		</div>
 	{/if}
 
-	{#if $selectedProtein}
-		<div class="hovered-data">
+	<div class="hovered-data-container">
+		{#if $selectedProtein}
 			<HoveredData data={$selectedProtein} />
 			<HoveredData data={protein_meta[$hoveredPoint]} />
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <button
@@ -114,10 +114,22 @@
 <style>
 	.container {
 		display: flex;
-		justify-content: space-between;
-		padding: 20px;
+		height: 100vh; /* Full height */
 	}
 
+	.scatterplot {
+		flex: 1; /* Take up half of the container's width */
+	}
+
+	.hovered-data-container {
+		flex: 1; /* Take up the other half of the container's width */
+		display: flex;
+		flex-direction: column; /* Stack children vertically */
+	}
+
+	.hovered-data-container > * {
+		flex: 1; /* Each HoveredData takes up half of the .hovered-data-container's height */
+	}
 	.highlighter {
 		flex: 1;
 		margin: 0 10px;

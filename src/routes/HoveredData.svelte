@@ -5,7 +5,9 @@
 <div class="hovered-data">
 	{#if data}
 		<h2>{data.scientific_name}</h2>
-		<p><strong>Sequence:</strong> {data.sequence}</p>
+		<div class="sequence">
+			<p><strong>Sequence:</strong> {data.sequence}</p>
+		</div>
 		<p><strong>Created at:</strong> {data.created_at}</p>
 		<p><strong>ID:</strong> {data.id}</p>
 		<p><strong>Biological Process:</strong> {data.biological_process}</p>
@@ -19,15 +21,18 @@
 
 <style>
 	.hovered-data {
+		height: 100%; /* Full height of its parent */
 		padding: 1em;
+		border: 1px solid #dcdcdc; /* Light grey border */
 		background-color: #f9f9f9;
-		border-radius: 4px;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+		box-sizing: border-box; /* Include padding and border in height calculation */
 	}
-	.hovered-data h2 {
-		margin-top: 0;
-	}
-	.hovered-data p {
-		margin: 0.5em 0;
+
+	.hovered-data .sequence {
+		height: 50px; /* Fixed height */
+		width: 100%; /* Full width of its parent */
+		word-break: break-all; /* Break words between any two letters (not only at spaces like break-word) */
+		overflow-y: auto; /* Enable vertical scrollbar */
+		white-space: pre-wrap; /* Preformating: respects line breaks and spaces, and it allows them to wrap */
 	}
 </style>
