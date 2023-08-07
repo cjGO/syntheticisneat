@@ -14,3 +14,4 @@ export const targetIndex = writable(-1);
 export const selectedProtein = writable(null)
 export const selectedAminoAcids = writable(null)
 
+export const modelSize = writable('facebook/esm2_t6_8M_UR50D')

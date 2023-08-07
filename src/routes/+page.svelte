@@ -2,19 +2,21 @@
 	import { onMount } from 'svelte';
 	import Scatterplot from './Scatterplot.svelte';
 	import AAscatter from './AAscatter.svelte';
+	import Switcher from '../components/Switcher.svelte';
 	import {
 		selectedPoint,
 		hoveredPoint,
 		selectedProtein,
 		highlightedIndex,
-		selectedAminoAcids
+		selectedAminoAcids,
+		modelSize
 	} from './stores';
 	import { transformData, runUMAP } from '../lib/helpers';
 	import HoveredData from './HoveredData.svelte';
 	import StringSpan from '../components/StringSpan.svelte';
 	import Highlighter from '../components/Highlighter.svelte';
 
-	let protein_umap;
+	let protein_umap_data;
 	let protein_meta;
 	let isLoading = true;
 
@@ -24,19 +26,27 @@
 		hoveredDatapoint = value;
 	});
 	// pull all data to be visualized
+	let protein_umap = {};
+
 	onMount(async () => {
 		try {
-			const [response1, response2] = await Promise.all([
-				fetch('https://api.syntheticisneat.com/all_protein_umaps'),
+			const [umap_small, umap_big, response2] = await Promise.all([
+				fetch(`https://api.syntheticisneat.com/model_umaps/?model_name=facebook/esm2_t6_8M_UR50D`),
+				fetch(
+					`https://api.syntheticisneat.com/model_umaps/?model_name=facebook/esm2_t33_650M_UR50D`
+				),
 				fetch('https://api.syntheticisneat.com/proteins/')
 			]);
 
-			protein_umap = await response1.json();
+			protein_umap_data = {
+				'facebook/esm2_t6_8M_UR50D': await umap_small.json(),
+				'facebook/esm2_t33_650M_UR50D': await umap_big.json()
+			};
 			protein_meta = await response2.json();
 		} catch (error) {
 			console.error('Failed to fetch data:', error);
 		} finally {
-			console.log(protein_umap);
+			console.log(protein_umap_data);
 			console.log(protein_meta);
 			isLoading = false; // update the loading state when the request completes
 		}
@@ -57,11 +67,13 @@
 		previousPoint = currentPoint;
 		$selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
 		console.log({ protein_id: $selectedProtein.id });
-		fetch(`https://api.syntheticisneat.com/amino_acids/${$selectedProtein.id}`)
+		// https://api.syntheticisneat.com/amino_acid_embedding/protein/1
+		fetch(`https://api.syntheticisneat.com/grab_aa_embeddings_full/${$selectedProtein.id}/`)
 			.then((response) => response.json())
 			.then((data) => {
+				console.log(data)
 				selected_protein = transformData(data);
-				console.log(selectedProtein);
+				console.log('SELECTEDPROTEIN HERE', selected_protein);
 			})
 			.catch((error) => {
 				console.error('Error:', error);
@@ -71,22 +83,23 @@
 	$: {
 		console.log({ selectedProteinStore: $selectedProtein });
 	}
+
 </script>
 
 <!-- <div style="width: 25%; height: 10; overflow: auto;">
 	<Highlighter />
 </div> -->
-
 {#if isLoading}
 	<p>Loading...</p>
 {:else if protein_umap.length === 0}
 	<p>No data available.</p>
 {/if}
+<Switcher arg1={'facebook/esm2_t6_8M_UR50D'} arg2={'facebook/esm2_t33_650M_UR50D'} />
 
 <div class="container">
-	{#if protein_umap}
+	{#if !isLoading}
 		<div class="scatterplot">
-			<Scatterplot data={protein_umap} meta={protein_meta} />
+			<Scatterplot {protein_umap_data} meta={protein_meta} />
 		</div>
 	{/if}
 
@@ -105,6 +118,8 @@
 		console.log({ 'selected protein from UMAP button': selected_protein });
 	}}>Run UMAP</button
 >
+<Switcher arg1={'facebook/esm2_t6_8M_UR50D'} arg2={'facebook/esm2_t33_650M_UR50D'} />
+
 <div class="container">
 	{#if Array.isArray(selected_protein) && selected_protein.length > 0 && selected_protein[0].hasOwnProperty('umap_component1')}
 		<div class="item">

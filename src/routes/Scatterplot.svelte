@@ -5,12 +5,24 @@
 	import { writable } from 'svelte/store';
 	import DataPoint from './DataPoint.svelte';
 	import RadioButtons from '../components/RadioButtons.svelte';
-	import { selectedPoint } from './stores';
-	export let data;
+	import { selectedPoint, modelSize } from './stores';
+	export let protein_umap_data;
 	export let meta;
 
 	import { createEventDispatcher } from 'svelte';
 	import { hoveredPoint } from './stores';
+
+	// let data = protein_umap_data;
+	// $: {
+	// 	data = data[$modelSize];
+	// }
+
+	let data = []; // Declare and default-initialize data
+
+	$: {
+		data = protein_umap_data && protein_umap_data[$modelSize] ? protein_umap_data[$modelSize] : [];
+	}
+
 	const dispatch = createEventDispatcher();
 
 	function handleMouseOver(datapoint) {
@@ -36,11 +48,13 @@
 	});
 
 	// Transform the data for the scatter plot
-	data = data.map((point) => ({
-		...point,
-		x: tweened(0, { duration: 2000 }),
-		y: tweened(0, { duration: 2000 })
-	}));
+	$: {
+		data = data.map((point) => ({
+			...point,
+			x: tweened(point.x, { duration: 1000 }),
+			y: tweened(point.y, { duration: 1000 })
+		}));
+	}
 
 	let x_data = 'umap_component1';
 	let y_data = 'umap_component2';
@@ -53,20 +67,25 @@
 	let xScale, yScale;
 
 	$: {
-		xScale = d3
-			.scaleLinear()
-			.domain(d3.extent(data, (d) => d[x_data]))
-			.range([0, width])
-			.nice();
-		yScale = d3
-			.scaleLinear()
-			.domain(d3.extent(data, (d) => d[y_data]))
-			.range([height, 0])
-			.nice();
-		data.forEach((d) => {
-			d.x.set(xScale(d[x_data]));
-			d.y.set(yScale(d[y_data]));
-		});
+		if (data && data.length > 0) {
+			xScale = d3
+				.scaleLinear()
+				.domain(d3.extent(data, (d) => d[x_data]))
+				.range([0, width])
+				.nice();
+			yScale = d3
+				.scaleLinear()
+				.domain(d3.extent(data, (d) => d[y_data]))
+				.range([height, 0])
+				.nice();
+			data.forEach((d) => {
+				d.x.update(() => xScale(d[x_data]));
+				d.y.update(() => yScale(d[y_data]));
+			});
+		} else {
+			xScale = d3.scaleLinear().range([0, width]);
+			yScale = d3.scaleLinear().range([height, 0]);
+		}
 	}
 
 	let svg;
@@ -82,9 +101,11 @@
 			transform="translate({margin.left}, {margin.top})"
 			style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
 		>
-			{#each data as point, index (index)}
-				<DataPoint x={point.x} y={point.y} {index} />
-			{/each}
+			{#if data && data.length > 0}
+				{#each data as point, index (index)}
+					<DataPoint x={point.x} y={point.y} {index} />
+				{/each}
+			{/if}
 		</g>
 	</svg>
 	<div class="radio-buttons">
