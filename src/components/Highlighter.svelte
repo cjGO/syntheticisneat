@@ -34,12 +34,17 @@
 		}
 	}
 </script>
-
+<p> You can click the Amino Acids in the sequence below or on the left scatterplot.</p>
+<p> ---<span style="color:red">Red</span> amino acids on the scatterplot : <b>Binding Sites</b></p>
+<p> ---<span style="color:green">Green</span> amino acids on the scatterplot : <b>Active Sites</b></p>
 <div>
 	{#each characters as char, index}
 		<HighlightableChar {char} {index} {highlightChar} />
 	{/each}
 </div>
+
+
+
 
 <style>
 	div {

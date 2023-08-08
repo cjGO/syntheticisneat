@@ -56,6 +56,7 @@
 	$: if (currentPoint !== null && currentPoint !== previousPoint) {
 		previousPoint = currentPoint;
 		selected_protein = null;
+		$highlightedIndex = null;
 		// $selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
 		$selectedProtein = protein_meta[currentPoint];
 		// https://api.syntheticisneat.com/amino_acid_embedding/protein/1
@@ -121,8 +122,8 @@
 		</div>
 		<div class="highlighter">
 			<Highlighter protein_sequence={protein_meta[$selectedPoint].sequence} />
-			<p>{JSON.stringify(selected_protein[$highlightedIndex], null, 2)}</p>
-		</div>
+
+					</div>
 	{/if}
 </div>
 
