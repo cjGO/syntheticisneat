@@ -56,7 +56,9 @@
 	let previousPoint = null;
 	$: if (currentPoint !== null && currentPoint !== previousPoint) {
 		previousPoint = currentPoint;
-		$selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
+		// $selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
+		$selectedProtein = protein_meta[$selectedPoint];
+
 		console.log({ protein_id: $selectedProtein.id });
 		// https://api.syntheticisneat.com/amino_acid_embedding/protein/1
 		fetch(`https://api.syntheticisneat.com/grab_aa_embeddings_full/${$selectedProtein.id}/`)
