@@ -93,7 +93,7 @@
 	on:click={() => {
 		umapLoading = true;
 
-		fetch(`https://api.syntheticisneat.com/run_umap_on_selected_protein/${$selectedProtein.id}/`)
+		fetch(`https://api.syntheticisneat.com/run_umap_on_selected_protein/${$selectedProtein.id}`)
 			.then((response) => response.json())
 			.then((data) => {
 				console.log(data);
