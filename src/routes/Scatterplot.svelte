@@ -6,7 +6,7 @@
 	import DataPoint from './DataPoint.svelte';
 	import RadioButtons from '../components/RadioButtons.svelte';
 	import { selectedPoint, modelSize } from './stores';
-	export let protein_umap_data;
+	export let protein_umap;
 	export let meta;
 
 	import { createEventDispatcher } from 'svelte';
@@ -17,12 +17,14 @@
 	// 	data = data[$modelSize];
 	// }
 
-	let data = []; // Declare and default-initialize data
+	let x = 'umap_component1';
+	let y = 'umap_component2';
+	let prefix = 'facebook/esm2_t6_8M_UR50D_';
 
-	$: {
-		data = protein_umap_data && protein_umap_data[$modelSize] ? protein_umap_data[$modelSize] : [];
-	}
+	$: x_data = `${$modelSize}${x}`;
+	$: y_data = `${$modelSize}${y}`;
 
+	let data = protein_umap; // Declare and default-initialize data
 	const dispatch = createEventDispatcher();
 
 	function handleMouseOver(datapoint) {
@@ -56,9 +58,7 @@
 		}));
 	}
 
-	let x_data = 'umap_component1';
-	let y_data = 'umap_component2';
-	let meta_pick = 'species_name';
+	let prefixes = ['facebook/esm2_t6_8M_UR50D_', 'facebook/esm2_t33_650M_UR50D_'];
 	let options = ['umap_component1', 'umap_component2', 'umap_component3', 'umap_component4'];
 	const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 	const width = 500 - margin.left - margin.right;
@@ -109,9 +109,15 @@
 		</g>
 	</svg>
 	<div class="radio-buttons">
-		<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} />
-		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} />
+		<RadioButtons label={'X axis'} {options} bind:selectedOption={x} />
+		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y} />
 	</div>
+	<label for="prefix-select">Choose a prefix:</label>
+	<select id="prefix-select" bind:value={prefix}>
+		{#each prefixes as prefixOption (prefixOption)}
+			<option value={prefixOption}>{prefixOption}</option>
+		{/each}
+	</select>
 </div>
 
 <style>

@@ -13,12 +13,11 @@
 
 		// Switch the modelSize depending on the display value
 		if (display === arg1) {
-			$modelSize = 'facebook/esm2_t6_8M_UR50D';
+			$modelSize = 'facebook/esm2_t6_8M_UR50D_';
 		} else {
-			$modelSize = 'facebook/esm2_t33_650M_UR50D';
+			$modelSize = 'facebook/esm2_t33_650M_UR50D_';
 		}
 	}
-  $: console.log({'modelSize':$modelSize})
 </script>
 
 <button on:click={switchArg}>

@@ -13,7 +13,6 @@
 	} from './stores';
 	import { transformData, runUMAP } from '../lib/helpers';
 	import HoveredData from './HoveredData.svelte';
-	import StringSpan from '../components/StringSpan.svelte';
 	import Highlighter from '../components/Highlighter.svelte';
 
 	let protein_umap_data;
@@ -30,24 +29,16 @@
 
 	onMount(async () => {
 		try {
-			const [umap_small, umap_big, response2] = await Promise.all([
-				fetch(`https://api.syntheticisneat.com/model_umaps/?model_name=facebook/esm2_t6_8M_UR50D`),
-				fetch(
-					`https://api.syntheticisneat.com/model_umaps/?model_name=facebook/esm2_t33_650M_UR50D`
-				),
+			const [response1, response2] = await Promise.all([
+				fetch(`https://api.syntheticisneat.com/grab_protein_umap_both`),
 				fetch('https://api.syntheticisneat.com/proteins/')
 			]);
-
-			protein_umap_data = {
-				'facebook/esm2_t6_8M_UR50D': await umap_small.json(),
-				'facebook/esm2_t33_650M_UR50D': await umap_big.json()
-			};
+			protein_umap = await response1.json();
 			protein_meta = await response2.json();
+			console.log(protein_umap);
 		} catch (error) {
 			console.error('Failed to fetch data:', error);
 		} finally {
-			console.log(protein_umap_data);
-			console.log(protein_meta);
 			isLoading = false; // update the loading state when the request completes
 		}
 	});
@@ -71,7 +62,7 @@
 		fetch(`https://api.syntheticisneat.com/grab_aa_embeddings_full/${$selectedProtein.id}/`)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data)
+				console.log(data);
 				selected_protein = transformData(data);
 				console.log('SELECTEDPROTEIN HERE', selected_protein);
 			})
@@ -83,7 +74,6 @@
 	$: {
 		console.log({ selectedProteinStore: $selectedProtein });
 	}
-
 </script>
 
 <!-- <div style="width: 25%; height: 10; overflow: auto;">
@@ -99,7 +89,7 @@
 <div class="container">
 	{#if !isLoading}
 		<div class="scatterplot">
-			<Scatterplot {protein_umap_data} meta={protein_meta} />
+			<Scatterplot {protein_umap} meta={protein_meta} />
 		</div>
 	{/if}
 
