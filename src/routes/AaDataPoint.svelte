@@ -6,14 +6,16 @@
 	export let y;
 	export let selected = false;
 	export let amino_acid;
-	export let binding;
+	export let binding_site;
+	export let active_site;
 	export let index;
+	export let location;
 
-	$: highlighted = $highlightedIndex === index;
-	$: hovered = $hoveredAA === index;
+	$: highlighted = $highlightedIndex === location;
+	$: hovered = $hoveredAA === location;
 
 	function handleMouseOver() {
-		hoveredAA.set(index);
+		hoveredAA.set(location);
 	}
 
 	function handleMouseOut() {
@@ -21,7 +23,7 @@
 	}
 
 	function handleClick() {
-		$targetIndex = index;
+		$targetIndex = location;
 	}
 </script>
 
@@ -38,8 +40,8 @@
 			y={$y}
 			text-anchor="middle"
 			dominant-baseline="central"
-			font-size={binding ? '14px' : '8px'}
-			fill={binding ? 'red' : 'black'}
+			font-size={binding_site || active_site ? '14px' : '8px'}
+			fill={active_site ? 'green' : binding_site ? 'red' : 'black'}
 			on:mouseover={handleMouseOver}
 			on:mouseout={handleMouseOut}
 			on:click={handleClick}

@@ -4,7 +4,7 @@
 	export let selectedOption = '';
 	export let label = '';
 	let intervalId;
-	let randomSelectActive = false;
+	let randomSelectActive = true;
 
 	function handleChange(option) {
 		selectedOption = option;
@@ -14,7 +14,7 @@
 		intervalId = setInterval(() => {
 			let randomOption = options[Math.floor(Math.random() * options.length)];
 			handleChange(randomOption);
-		}, 5000);
+		}, 4000);
 	}
 
 	function stopRandomSelect() {

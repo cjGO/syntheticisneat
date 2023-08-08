@@ -11,13 +11,12 @@
 		selectedAminoAcids,
 		modelSize
 	} from './stores';
-	import { transformData, runUMAP } from '../lib/helpers';
 	import HoveredData from './HoveredData.svelte';
 	import Highlighter from '../components/Highlighter.svelte';
 
-	let protein_umap_data;
 	let protein_meta;
 	let isLoading = true;
+	let umapLoading = false;
 
 	let hoveredDatapoint = null;
 
@@ -56,25 +55,10 @@
 	let previousPoint = null;
 	$: if (currentPoint !== null && currentPoint !== previousPoint) {
 		previousPoint = currentPoint;
+		selected_protein = null;
 		// $selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
-		$selectedProtein = protein_meta[$selectedPoint];
-
-		console.log({ protein_id: $selectedProtein.id });
+		$selectedProtein = protein_meta[currentPoint];
 		// https://api.syntheticisneat.com/amino_acid_embedding/protein/1
-		fetch(`https://api.syntheticisneat.com/grab_aa_embeddings_full/${$selectedProtein.id}/`)
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data);
-				selected_protein = transformData(data);
-				console.log('SELECTEDPROTEIN HERE', selected_protein);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
-	}
-
-	$: {
-		console.log({ selectedProteinStore: $selectedProtein });
 	}
 </script>
 
@@ -86,7 +70,7 @@
 {:else if protein_umap.length === 0}
 	<p>No data available.</p>
 {/if}
-<Switcher arg1={'Click: Small Model'} arg2={'Click: Big Model'} />
+<Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
 
 <div class="container">
 	{#if !isLoading}
@@ -107,23 +91,41 @@
 
 <button
 	on:click={() => {
-		// console.log('runumap');
-		selected_protein = runUMAP(selected_protein);
-		console.log({ 'selected protein from UMAP button': selected_protein });
-	}}>Run UMAP</button
->
+		umapLoading = true;
+
+		fetch(`https://api.syntheticisneat.com/run_umap_on_selected_protein/${$selectedProtein.id}/`)
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
+				selected_protein = [...data]; // Create a new array with the same contents as data
+				console.log('SELECTEDPROTEIN HERE', selected_protein);
+				umapLoading = false; // Set umapLoading to false when fetch is complete
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+				umapLoading = false; // Set umapLoading to false when fetch breaks
+			});
+	}}
+	disabled={umapLoading || currentPoint === null} 
+		>
+	Run UMAP (~15 seconds)
+</button>
+
+
+<Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
 
 <div class="container">
-	{#if Array.isArray(selected_protein) && selected_protein.length > 0 && selected_protein[0].hasOwnProperty('umap_component1')}
+	{#if Array.isArray(selected_protein) && selected_protein.length > 0 && selected_protein[0].hasOwnProperty('facebook/esm2_t6_8M_UR50D_umap_component_1')}
 		<div class="item">
-			<AAscatter data={selected_protein} />
+			<AAscatter {selected_protein} />
 		</div>
 		<div class="highlighter">
-			<Highlighter protein_sequence={$selectedProtein.sequence} />
+			<Highlighter protein_sequence={protein_meta[$selectedPoint].sequence} />
 			<p>{JSON.stringify(selected_protein[$highlightedIndex], null, 2)}</p>
 		</div>
 	{/if}
 </div>
+
 <br />
 
 <style>

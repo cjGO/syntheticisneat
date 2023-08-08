@@ -5,12 +5,20 @@
 	import { writable } from 'svelte/store';
 	import AaDataPoint from './AaDataPoint.svelte';
 	import RadioButtons from '../components/RadioButtons.svelte';
-	import { selectedPoint } from './stores';
-	export let data;
-	import { runUMAP } from '../lib/helpers';
+	import { selectedPoint, modelSize } from './stores';
+	export let selected_protein;
 	import { hoveredAminoAcidStore } from './aa_store';
 
 	let hoveredAminoAcid = null;
+
+	let x = 'umap_component_1';
+	let y = 'umap_component_2';
+	let prefix = 'facebook/esm2_t6_8M_UR50D_';
+
+	$: x_data = `${$modelSize}${x}`;
+	$: y_data = `${$modelSize}${y}`;
+
+	let data = selected_protein;
 
 	hoveredAminoAcidStore.subscribe((value) => {
 		hoveredAminoAcid = value;
@@ -34,16 +42,15 @@
 	});
 
 	// Transform the data for the scatter plot
-	data = data.map((point) => ({
-		...point,
-		x: tweened(0, { duration: 2000 }),
-		y: tweened(0, { duration: 2000 })
-	}));
-
-	let x_data = 'umap_component0';
-	let y_data = 'umap_component1';
-	let options = ['umap_component0', 'umap_component1', 'umap_component2', 'umap_component3'];
-
+	$: {
+		data = data.map((point) => ({
+			...point,
+			x: tweened(point.x, { duration: 1000 }),
+			y: tweened(point.y, { duration: 1000 })
+		}));
+	}
+	let prefixes = ['facebook/esm2_t6_8M_UR50D_', 'facebook/esm2_t33_650M_UR50D_'];
+	let options = ['umap_component_1', 'umap_component_2', 'umap_component_3', 'umap_component_4'];
 	const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 	const width = 500 - margin.left - margin.right;
 	const height = 500 - margin.top - margin.bottom;
@@ -51,20 +58,25 @@
 	let xScale, yScale;
 
 	$: {
-		xScale = d3
-			.scaleLinear()
-			.domain(d3.extent(data, (d) => d[x_data]))
-			.range([0, width])
-			.nice();
-		yScale = d3
-			.scaleLinear()
-			.domain(d3.extent(data, (d) => d[y_data]))
-			.range([height, 0])
-			.nice();
-		data.forEach((d) => {
-			d.x.set(xScale(d[x_data]));
-			d.y.set(yScale(d[y_data]));
-		});
+		if (data && data.length > 0) {
+			xScale = d3
+				.scaleLinear()
+				.domain(d3.extent(data, (d) => d[x_data]))
+				.range([0, width])
+				.nice();
+			yScale = d3
+				.scaleLinear()
+				.domain(d3.extent(data, (d) => d[y_data]))
+				.range([height, 0])
+				.nice();
+			data.forEach((d) => {
+				d.x.update(() => xScale(d[x_data]));
+				d.y.update(() => yScale(d[y_data]));
+			});
+		} else {
+			xScale = d3.scaleLinear().range([0, width]);
+			yScale = d3.scaleLinear().range([height, 0]);
+		}
 	}
 
 	let svg;
@@ -82,20 +94,24 @@
 			transform="translate({margin.left}, {margin.top})"
 			style="transform: translate({$zoomTransform.x}px, {$zoomTransform.y}px) scale({$zoomTransform.k})"
 		>
-			{#each data as point, index (index)}
-				<AaDataPoint
-					{index}
-					x={point.x}
-					y={point.y}
-					amino_acid={point.amino_acid}
-					binding={point.binding}
-				/>
-			{/each}
+			{#if data && data.length > 0}
+				{#each data as point, index (index)}
+					<AaDataPoint
+						{index}
+						x={point.x}
+						y={point.y}
+						amino_acid={point.amino_acid}
+						binding_site={point.binding_site}
+						active_site={point.active_site}
+						location = {point.location}
+					/>
+				{/each}
+			{/if}
 		</g>
 	</svg>
 	<div class="radio-buttons">
-		<RadioButtons label={'X axis'} {options} bind:selectedOption={x_data} />
-		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y_data} />
+		<RadioButtons label={'X axis'} {options} bind:selectedOption={x} />
+		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y} />
 	</div>
 </div>
 

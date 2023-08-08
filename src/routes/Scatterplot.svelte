@@ -27,11 +27,6 @@
 	let data = protein_umap; // Declare and default-initialize data
 	const dispatch = createEventDispatcher();
 
-	function handleMouseOver(datapoint) {
-		dispatch('datapointHover', { datapoint });
-		hoveredPoint.set(datapoint);
-	}
-
 	const zoomTransform = writable({ x: 0, y: 0, k: 1 });
 
 	function handleZoom(event) {
@@ -112,7 +107,6 @@
 		<RadioButtons label={'X axis'} {options} bind:selectedOption={x} />
 		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y} />
 	</div>
-	<label for="prefix-select">Choose a prefix:</label>
 </div>
 
 <style>

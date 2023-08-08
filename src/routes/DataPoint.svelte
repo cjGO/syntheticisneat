@@ -17,7 +17,7 @@
 <circle
 	cx={$x}
 	cy={$y}
-	r={selected ? '1' : '1'}
+	r={index == $selectedPoint ? '3' : '1'}
 	fill={index == $hoveredPoint ? 'blue' : index == $selectedPoint ? 'red' : 'black'}
 	on:click={() => {
 		$selectedPoint = index;
