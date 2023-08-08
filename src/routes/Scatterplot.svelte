@@ -103,7 +103,7 @@
 		>
 			{#if data && data.length > 0}
 				{#each data as point, index (index)}
-					<DataPoint x={point.x} y={point.y} {index} />
+					<DataPoint x={point.x} y={point.y} {index}  />
 				{/each}
 			{/if}
 		</g>
@@ -113,11 +113,6 @@
 		<RadioButtons label={'Y axis'} {options} bind:selectedOption={y} />
 	</div>
 	<label for="prefix-select">Choose a prefix:</label>
-	<select id="prefix-select" bind:value={prefix}>
-		{#each prefixes as prefixOption (prefixOption)}
-			<option value={prefixOption}>{prefixOption}</option>
-		{/each}
-	</select>
 </div>
 
 <style>

@@ -6,7 +6,7 @@
 
 	// Initialize the store with the first model
 
-	let display = $modelSize;
+	let display = 'Click';
 
 	function switchArg() {
 		display = display === arg1 ? arg2 : arg1;

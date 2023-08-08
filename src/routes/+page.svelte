@@ -84,7 +84,7 @@
 {:else if protein_umap.length === 0}
 	<p>No data available.</p>
 {/if}
-<Switcher arg1={'facebook/esm2_t6_8M_UR50D'} arg2={'facebook/esm2_t33_650M_UR50D'} />
+<Switcher arg1={'Click: Small Model'} arg2={'Click: Big Model'} />
 
 <div class="container">
 	{#if !isLoading}
@@ -94,7 +94,9 @@
 	{/if}
 
 	<div class="hovered-data-container">
-		<HoveredData data={$selectedProtein ? $selectedProtein : null} />
+		<HoveredData
+			data={protein_meta && protein_meta[$selectedPoint] ? protein_meta[$selectedPoint] : null}
+		/>
 		<HoveredData
 			data={protein_meta && protein_meta[$hoveredPoint] ? protein_meta[$hoveredPoint] : null}
 		/>
@@ -108,7 +110,6 @@
 		console.log({ 'selected protein from UMAP button': selected_protein });
 	}}>Run UMAP</button
 >
-<Switcher arg1={'facebook/esm2_t6_8M_UR50D'} arg2={'facebook/esm2_t33_650M_UR50D'} />
 
 <div class="container">
 	{#if Array.isArray(selected_protein) && selected_protein.length > 0 && selected_protein[0].hasOwnProperty('umap_component1')}
