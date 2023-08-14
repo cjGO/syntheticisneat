@@ -72,7 +72,7 @@
 	<p>No data available.</p>
 {/if}
 <Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
-
+<p> Click a protein point to turn it red to view the amino acid UMAP for that protein below! </p> 
 <div class="container">
 	{#if !isLoading}
 		<div class="scatterplot">
