@@ -58,12 +58,31 @@
 	}
 
 	function handleMouseMove(event) {
-		if (rectStart) {
-			const rect = svgElement.getBoundingClientRect();
-			rectEnd = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-			rectangles[rectangles.length - 1].end = rectEnd;
-		}
-	}
+    const rect = svgElement.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    if (selectedRectangle !== null) {
+        const selectedRect = rectangles.find(rect => rect.id === selectedRectangle);
+
+        const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
+        const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
+
+        const dx = mouseX - oldCenterX;
+        const dy = mouseY - oldCenterY;
+
+        selectedRect.start.x += dx;
+        selectedRect.start.y += dy;
+        selectedRect.end.x += dx;
+        selectedRect.end.y += dy;
+
+        rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
+    } else if (rectStart) {
+        rectEnd = { x: mouseX, y: mouseY };
+        rectangles[rectangles.length - 1].end = rectEnd;
+    }
+}
+
 
 	function handleRectangleDoubleClick(id) {
 		rectangles = rectangles.filter((rect) => rect.id !== id);
