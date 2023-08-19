@@ -11,6 +11,7 @@
 	let width;
 	let height;
 	let x_umapValues;
+
 	const margin = { top: 20, right: 15, bottom: 20, left: 0 };
 	let innerWidth = width - margin.right - margin.left;
 	let innerHeight = height - margin.top - margin.bottom;
@@ -38,14 +39,38 @@
 				.range([innerHeight, 0]);
 		}
 	}
-
 	$: {
 		innerWidth = width - margin.right - margin.left;
 		innerHeight = height - margin.top - margin.bottom;
 	}
 
-	$: {
-		console.log(height);
+	let rectangles = [];
+	let rectStart = null;
+	let rectEnd = null;
+	let svgElement;
+
+	let idCounter = 0;
+
+	function handleMouseDown(event) {
+		const rect = svgElement.getBoundingClientRect();
+		rectStart = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+		rectangles.push({ id: idCounter++, start: rectStart, end: rectStart });
+	}
+
+	function handleMouseMove(event) {
+		if (rectStart) {
+			const rect = svgElement.getBoundingClientRect();
+			rectEnd = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+			rectangles[rectangles.length - 1].end = rectEnd;
+		}
+	}
+
+	function handleRectangleDoubleClick(id) {
+  rectangles = rectangles.filter(rect => rect.id !== id);
+}
+
+	function handleMouseUp() {
+		rectStart = null;
 	}
 </script>
 
@@ -57,10 +82,28 @@
 
 {#if data && data.length > 0 && xScale && yScale && x_umapValues}
 	<div class="chart-container" bind:clientWidth={width} bind:clientHeight={height}>
-		<svg {width} {height}>
+		<svg
+			{width}
+			{height}
+			bind:this={svgElement}
+			on:mousedown={handleMouseDown}
+			on:mousemove={handleMouseMove}
+			on:mouseup={handleMouseUp}
+		>
 			<g class="inner-chart" transform="translate({margin.left}, {margin.top})">
 				<AxisX {xScale} height={innerHeight} width={innerWidth} />
 				<AxisY {yScale} width={innerWidth} />
+
+				{#each rectangles as rect (rect.id)}
+					<rect
+						x={Math.min(rect.start.x, rect.end.x)}
+						y={Math.min(rect.start.y, rect.end.y)}
+						width={Math.abs(rect.end.x - rect.start.x)}
+						height={Math.abs(rect.end.y - rect.start.y)}
+						fill="rgba(0, 0, 0, 0.5)"
+						on:dblclick={() => handleRectangleDoubleClick(rect.id)}
+					/>
+				{/each}
 
 				{#each data as d}
 					<circle
