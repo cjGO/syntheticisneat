@@ -48,6 +48,7 @@
 	let rectStart = null;
 	let rectEnd = null;
 	let svgElement;
+	let activeRectangle = null; // for the rectangle being actively drawn
 
 	let idCounter = 0;
 
@@ -58,34 +59,29 @@
 	}
 
 	function handleMouseMove(event) {
-    const rect = svgElement.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+		const rect = svgElement.getBoundingClientRect();
+		const mouseX = event.clientX - rect.left;
+		const mouseY = event.clientY - rect.top;
 
-    if (selectedRectangle !== null) {
-        const selectedRect = rectangles.find(rect => rect.id === selectedRectangle);
+		if (selectedRectangle !== null) {
+			const selectedRect = rectangles.find((rect) => rect.id === selectedRectangle);
 
-        const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
-        const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
+			const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
+			const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
 
-        const dx = mouseX - oldCenterX;
-        const dy = mouseY - oldCenterY;
+			const dx = mouseX - oldCenterX;
+			const dy = mouseY - oldCenterY;
 
-        selectedRect.start.x += dx;
-        selectedRect.start.y += dy;
-        selectedRect.end.x += dx;
-        selectedRect.end.y += dy;
+			selectedRect.start.x += dx;
+			selectedRect.start.y += dy;
+			selectedRect.end.x += dx;
+			selectedRect.end.y += dy;
 
-        rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
-    } else if (rectStart) {
-        rectEnd = { x: mouseX, y: mouseY };
-        rectangles[rectangles.length - 1].end = rectEnd;
-    }
-}
-
-
-	function handleRectangleDoubleClick(id) {
-		rectangles = rectangles.filter((rect) => rect.id !== id);
+			rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
+		} else if (rectStart) {
+			rectEnd = { x: mouseX, y: mouseY };
+			rectangles[rectangles.length - 1].end = rectEnd;
+		}
 	}
 
 	function handleMouseUp() {
@@ -99,6 +95,14 @@
 			document.selection.empty();
 		}
 	}
+
+	function handleRectangleDoubleClick(id) {
+		console.log('id: ', id);
+		console.log('Double click: ', id);
+		rectangles = rectangles.filter((rect) => rect.id !== id);
+		console.log(rectangles);
+	}
+
 	let selectedRectangle = null;
 
 	function handleRectangleClick(id) {
@@ -107,6 +111,38 @@
 		} else {
 			selectedRectangle = id;
 		}
+	}
+
+	function getPointsInRectangles(data, rectangles) {
+		let pointsInRectangles = rectangles.map((rect) => {
+			if (!rectangles || rectangles.length === 0) {
+				return [];
+			}
+			let pointsInRect = data.filter((point) => {
+				let rectStartX = Math.min(rect.start.x, rect.end.x);
+				let rectEndX = Math.max(rect.start.x, rect.end.x);
+				let rectStartY = Math.min(rect.start.y, rect.end.y);
+				let rectEndY = Math.max(rect.start.y, rect.end.y);
+
+				let pointX = xScale(point.umap_x);
+				let pointY = yScale(point.umap_y);
+
+				return (
+					pointX >= rectStartX && pointX <= rectEndX && pointY >= rectStartY && pointY <= rectEndY
+				);
+			});
+
+			return { rectId: rect.id, points: pointsInRect };
+		});
+
+		return pointsInRectangles;
+	}
+
+	let pointsInRectangles = [];
+
+	$: {
+		pointsInRectangles = getPointsInRectangles(data, rectangles);
+		console.log(pointsInRectangles);
 	}
 </script>
 
