@@ -66,11 +66,28 @@
 	}
 
 	function handleRectangleDoubleClick(id) {
-  rectangles = rectangles.filter(rect => rect.id !== id);
-}
+		rectangles = rectangles.filter((rect) => rect.id !== id);
+	}
 
 	function handleMouseUp() {
 		rectStart = null;
+
+		// Deselect any highlighted text
+		if (window.getSelection) {
+			window.getSelection().removeAllRanges();
+		} else if (document.selection) {
+			// For IE
+			document.selection.empty();
+		}
+	}
+	let selectedRectangle = null;
+
+	function handleRectangleClick(id) {
+		if (selectedRectangle === id) {
+			selectedRectangle = null;
+		} else {
+			selectedRectangle = id;
+		}
 	}
 </script>
 
@@ -101,7 +118,9 @@
 						width={Math.abs(rect.end.x - rect.start.x)}
 						height={Math.abs(rect.end.y - rect.start.y)}
 						fill="rgba(0, 0, 0, 0.5)"
+						style={rect.id === selectedRectangle ? 'stroke: red; stroke-width: 2;' : ''}
 						on:dblclick={() => handleRectangleDoubleClick(rect.id)}
+						on:click={() => handleRectangleClick(rect.id)}
 					/>
 				{/each}
 
