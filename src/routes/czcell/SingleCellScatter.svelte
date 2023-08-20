@@ -4,6 +4,7 @@
 	import AxisX from './AxisX.svelte';
 	import AxisY from './AxisY.svelte';
   export let data;
+	import { filter_state, color_scheme, hovered_cat} from './czcell_stores';
 
 	let isLoading = true;
 	let xScale;
@@ -140,6 +141,14 @@
 		pointsInRectangles = getPointsInRectangles(data, rectangles);
 		// console.log(pointsInRectangles);
 	}
+
+	let hover_category;
+	let hover_type;
+	$:{
+		hover_category = $hovered_cat[0]
+		hover_type = $hovered_cat[1]
+		console.log(hover_category)
+	}
 </script>
 
 
@@ -163,7 +172,7 @@
 					<circle
 						cx={xScale(d.umap_x)}
 						cy={yScale(d.umap_y)}
-						r={1}
+						r={(hover_category && d[hover_category] == hover_type) ? 5 : 1}
 						fill="purple"
 					/>
 				{/each}

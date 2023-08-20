@@ -17,6 +17,10 @@
 		$hovered_cat = [sub_key, subcat_item];
 		console.log($hovered_cat)
 	}
+
+	function clearHoveredCat() {
+	$hovered_cat = ['',''];
+}
 </script>
 
 <div class="container">
@@ -32,9 +36,10 @@
 
 {#if is_collapsed}
 	{#each Object.entries(value.values) as [subcat_key, subcat_item]}
-		<div class="item-row" on:mouseover={logHello(key,subcat_key)}>
-			<input type="checkbox" bind:checked={subcat_item.filter} on:change={handleFilterChange}
-			/>
+		<div class="item-row" 
+		     on:mouseover="{() => logHello(key,subcat_key)}"
+		     on:mouseout="{() => clearHoveredCat()}">
+			<input type="checkbox" bind:checked={subcat_item.filter} on:change={handleFilterChange}/>
 			<p>{subcat_key}: {subcat_item.count}</p>
 		</div>
 	{/each}
