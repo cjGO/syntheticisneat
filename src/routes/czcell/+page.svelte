@@ -4,11 +4,14 @@
 	import { onMount } from 'svelte';
 	import { summarizeKeys } from './sc_helpers';
 	import Barplot from './Barplot.svelte';
+	import {filter_state, color_scheme} from './czcell_stores'
+
 	let isLoading = true;
 
 	const endpoint = 'https://api.syntheticisneat.com/random_annotations/';
 	let data;
 	let filter_categorys;
+
 	onMount(async function () {
 		const response = await fetch(endpoint);
 		data = await response.json();
@@ -16,10 +19,12 @@
 		filter_categorys = summarizeKeys(data);
 		let keysArray = Object.keys(filter_categorys);
 
-		console.log(filter_categorys);
-		console.log(filter_categorys[keysArray[1]]);
-		isLoading = false;
+		$filter_state = (filter_categorys);
+		console.log($filter_state)
+		 isLoading = false;
 	});
+
+	$: console.log({'filterstatus':$filter_state})
 </script>
 
 {#if isLoading}

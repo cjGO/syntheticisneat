@@ -158,6 +158,16 @@
 				<AxisX {xScale} height={innerHeight} width={innerWidth} />
 				<AxisY {yScale} width={innerWidth} />
 
+
+				{#each data as d}
+					<circle
+						cx={xScale(d.umap_x)}
+						cy={yScale(d.umap_y)}
+						r={1}
+						fill="purple"
+					/>
+				{/each}
+				
 				{#each rectangles as rect (rect.id)}
 					<rect
 						x={Math.min(rect.start.x, rect.end.x)}
@@ -168,17 +178,6 @@
 						style={rect.id === selectedRectangle ? 'stroke: red; stroke-width: 2;' : ''}
 						on:dblclick={() => handleRectangleDoubleClick(rect.id)}
 						on:click={() => handleRectangleClick(rect.id)}
-					/>
-				{/each}
-
-				{#each data as d}
-					<circle
-						cx={xScale(d.umap_x)}
-						cy={yScale(d.umap_y)}
-						r={1}
-						fill="purple"
-						stroke="black"
-						stroke-width="1"
 					/>
 				{/each}
 			</g>

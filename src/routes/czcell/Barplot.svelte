@@ -55,7 +55,22 @@ function updateSelection(event) {
         selectionBox.setAttribute('x', Math.min(event.clientX, selectionStart));
         selectionBox.setAttribute('width', Math.abs(event.clientX - selectionStart));
     }
+    
+    // Update bin colors
+    selectionStart = Number(selectionBox.getAttribute('x'));
+    let selectionEnd = selectionStart + Number(selectionBox.getAttribute('width'));
+    for (let i = 0; i < n_bins; i++) {
+        let bin = document.getElementById(`bin-${i}`);
+        let binStart = Number(bin.getAttribute('x'));
+        let binEnd = binStart + Number(bin.getAttribute('width'));
+        if (binStart >= selectionStart && binEnd <= selectionEnd) {
+            bin.setAttribute('fill', 'blue'); // set fill color to blue if bin is within selection
+        } else {
+            bin.setAttribute('fill', 'black'); // set fill color to black if bin is not within selection
+        }
+    }
 }
+
 
 
 	function endSelection() {

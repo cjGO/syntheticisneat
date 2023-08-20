@@ -1,35 +1,43 @@
 <script>
 	export let key;
 	export let value;
+	import { filter_state, color_scheme, hovered_cat} from './czcell_stores';
 
 	let is_collapsed = false;
 	const toggleCollapse = () => {
 		is_collapsed = !is_collapsed;
 	};
 
-  function logHello() {
-    console.log('hello');
-  }
+	function handleFilterChange() {
+		$filter_state[key].value = value.filter;
+		console.log($filter_state)
+	}
+
+	function logHello(sub_key,subcat_item) {
+		$hovered_cat = [sub_key, subcat_item];
+		console.log($hovered_cat)
+	}
 </script>
 
 <div class="container">
 	<div class="left">
-		<input type="checkbox" id="checkbox1" name="checkbox1" bind:checked={value.filter} />
+
 		<label for="checkbox1">{key}</label>
 		<button class="arrow-button" on:click={toggleCollapse}>
 			{is_collapsed ? '⇩' : '⇨'}
 		</button>
 	</div>
-	<input type="checkbox" id="checkbox2" name="checkbox2" bind:checked={value.color_scale} />
+	<input type="checkbox" id="checkbox2" name="color" bind:checked={value.color_scale} />
 </div>
 
 {#if is_collapsed}
-  {#each Object.entries(value.values) as [key, item]}
-    <div class="item-row" on:mouseover={logHello}>
-      <input type="checkbox" bind:checked={item.filter} />
-      <p>{key}: {item.count}</p>
-    </div>
-  {/each}
+	{#each Object.entries(value.values) as [subcat_key, subcat_item]}
+		<div class="item-row" on:mouseover={logHello(key,subcat_key)}>
+			<input type="checkbox" bind:checked={subcat_item.filter} on:change={handleFilterChange}
+			/>
+			<p>{subcat_key}: {subcat_item.count}</p>
+		</div>
+	{/each}
 {/if}
 
 <style>
