@@ -10,12 +10,10 @@
 
 	function handleFilterChange() {
 		$filter_state[key].value = value.filter;
-		console.log($filter_state)
 	}
 
 	function logHello(sub_key,subcat_item) {
 		$hovered_cat = [sub_key, subcat_item];
-		console.log($hovered_cat)
 	}
 
 	function clearHoveredCat() {

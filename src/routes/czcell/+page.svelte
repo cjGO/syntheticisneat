@@ -4,13 +4,14 @@
 	import { onMount } from 'svelte';
 	import { summarizeKeys } from './sc_helpers';
 	import Barplot from './Barplot.svelte';
-	import {filter_state, color_scheme} from './czcell_stores'
+	import { filter_state, color_scheme } from './czcell_stores';
 
 	let isLoading = true;
-
-	const endpoint = 'https://api.syntheticisneat.com/random_annotations/';
 	let data;
 	let filter_categorys;
+	let filteredData;
+
+	const endpoint = 'https://api.syntheticisneat.com/random_annotations/';
 
 	onMount(async function () {
 		const response = await fetch(endpoint);
@@ -18,13 +19,22 @@
 		console.log(data);
 		filter_categorys = summarizeKeys(data);
 		let keysArray = Object.keys(filter_categorys);
-
-		$filter_state = (filter_categorys);
-		console.log($filter_state)
-		 isLoading = false;
+		$filter_state = filter_categorys;
+		isLoading = false;
 	});
 
-	$: console.log({'filterstatus':$filter_state})
+	$: {
+		if ($filter_state && data) {
+			filteredData = data.filter((item) => {
+				for (let key in $filter_state) {
+					if (!$filter_state[key].values[item[key]].filter) {
+						return false;
+					}
+				}
+				return true;
+			});
+		}
+	}
 </script>
 
 {#if isLoading}
@@ -32,13 +42,12 @@
 {/if}
 
 {#if data}
-<Barplot data={Object.entries(data).map(([key, value]) => value.n_count_rna)} />
+	<Barplot data={Object.entries(data).map(([key, value]) => value.n_count_rna)} />
 	<div class="container">
 		<div class="sidebar">
 			{#each Object.entries(filter_categorys) as [key, value]}
 				<div>
 					<FilterSidebar {key} {value} />
-
 				</div>
 			{/each}
 		</div>

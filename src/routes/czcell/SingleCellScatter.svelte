@@ -12,19 +12,34 @@
 	let width;
 	let height;
 	let x_umapValues;
-
+	let filtered_data = data;
 	const margin = { top: 20, right: 15, bottom: 20, left: 0 };
 	let innerWidth = width - margin.right - margin.left;
 	let innerHeight = height - margin.top - margin.bottom;
 
 	$: {
 		if (data.length > 0) {
-			x_umapValues = data.map((obj) => obj.umap_x);
+
+
+
+		if ($filter_state && data) {
+			filtered_data = data.filter((item) => {
+				for (let key in $filter_state) {
+					if (!$filter_state[key].values[item[key]].filter) {
+						return false;
+					}
+				}
+				return true;
+			});
+		}
+	
+
+			x_umapValues = filtered_data.map((obj) => obj.umap_x);
 			xScale = scaleLinear()
 				.domain([Math.min(...x_umapValues), Math.max(...x_umapValues)])
 				.range([15, innerWidth]);
 
-			const y_umapValues = data.map((obj) => obj.umap_y);
+			const y_umapValues = filtered_data.map((obj) => obj.umap_y);
 			yScale = scaleLinear()
 				.domain([Math.min(...y_umapValues), Math.max(...y_umapValues)])
 				.range([innerHeight, 0]);
@@ -44,12 +59,13 @@
 	let idCounter = 0;
 
 	function handleMouseDown(event) {
+		console.log('click');
 		if (isDeleting) {
-        return;
-    }
+			return;
+		}
 		if (isDisabled) {
-        return;
-    }
+			return;
+		}
 		const rect = svgElement.getBoundingClientRect();
 		rectStart = { x: event.clientX - rect.left, y: event.clientY - rect.top };
 		rectangles.push({ id: idCounter++, start: rectStart, end: rectStart });
@@ -57,8 +73,8 @@
 
 	function handleMouseMove(event) {
 		if (isDisabled) {
-        return;
-    }
+			return;
+		}
 		const rect = svgElement.getBoundingClientRect();
 		const mouseX = event.clientX - rect.left;
 		const mouseY = event.clientY - rect.top;
@@ -89,8 +105,8 @@
 
 	function handleMouseUp() {
 		if (isDisabled) {
-        return;
-    }
+			return;
+		}
 		rectStart = null;
 
 		// Deselect any highlighted text
@@ -104,34 +120,56 @@
 	let isDeleting = false;
 
 	let isDisabled = false;
+	let selectedRectangle = null;
 
-function handleRectangleDoubleClick(id) {
-    isDisabled = true;
-    isDeleting = true;
-    setTimeout(function () { 
-        rectangles = rectangles.filter((rect) => rect.id !== id);
-        isDeleting = false;
-        isDisabled = false;
-    }, 1000);
+	function handleRectangleClick(id, event) {
+    event.stopPropagation();
+    if (selectedRectangle === id) {
+        selectedRectangle = null;
+    } else {
+        selectedRectangle = id;
+        const selectedRect = rectangles.find((rect) => rect.id === selectedRectangle);
+        if (selectedRect) {
+            const rect = svgElement.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
+            const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
+
+            const dx = mouseX - oldCenterX;
+            const dy = mouseY - oldCenterY;
+
+            selectedRect.start.x += dx;
+            selectedRect.start.y += dy;
+            selectedRect.end.x += dx;
+            selectedRect.end.y += dy;
+
+            rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
+        }
+    }
 }
 
 
-	let selectedRectangle = null;
 
-	function handleRectangleClick(id) {
-		if (selectedRectangle === id) {
-			selectedRectangle = null;
-		} else {
-			selectedRectangle = id;
-		}
+	function handleRectangleDoubleClick(id, event) {
+		event.stopPropagation();
+		isDisabled = true;
+		isDeleting = true;
+		setTimeout(function () {
+			rectangles = rectangles.filter((rect) => rect.id !== id);
+			isDeleting = false;
+			isDisabled = false;
+		}, 122);
+		console.log('deleted');
 	}
 
-	function getPointsInRectangles(data, rectangles) {
+	function getPointsInRectangles(filtered_data, rectangles) {
 		let pointsInRectangles = rectangles.map((rect) => {
 			if (!rectangles || rectangles.length === 0) {
 				return [];
 			}
-			let pointsInRect = data.filter((point) => {
+			let pointsInRect = filtered_data.filter((point) => {
 				let rectStartX = Math.min(rect.start.x, rect.end.x);
 				let rectEndX = Math.max(rect.start.x, rect.end.x);
 				let rectStartY = Math.min(rect.start.y, rect.end.y);
@@ -154,7 +192,7 @@ function handleRectangleDoubleClick(id) {
 	let pointsInRectangles = [];
 
 	$: {
-		pointsInRectangles = getPointsInRectangles(data, rectangles);
+		pointsInRectangles = getPointsInRectangles(filtered_data, rectangles);
 		// console.log(pointsInRectangles);
 	}
 
@@ -163,11 +201,10 @@ function handleRectangleDoubleClick(id) {
 	$: {
 		hover_category = $hovered_cat[0];
 		hover_type = $hovered_cat[1];
-		console.log(hover_category);
 	}
 </script>
 
-{#if data && data.length > 0 && xScale && yScale && x_umapValues}
+{#if filtered_data && filtered_data.length > 0 && xScale && yScale && x_umapValues}
 	<div class="chart-container" bind:clientWidth={width} bind:clientHeight={height}>
 		<svg
 			{width}
@@ -181,7 +218,7 @@ function handleRectangleDoubleClick(id) {
 				<AxisX {xScale} height={innerHeight} width={innerWidth} />
 				<AxisY {yScale} width={innerWidth} />
 
-				{#each data as d}
+				{#each filtered_data as d}
 					<circle
 						cx={xScale(d.umap_x)}
 						cy={yScale(d.umap_y)}
@@ -198,8 +235,8 @@ function handleRectangleDoubleClick(id) {
 						height={Math.abs(rect.end.y - rect.start.y)}
 						fill="rgba(0, 0, 0, 0.5)"
 						style={rect.id === selectedRectangle ? 'stroke: red; stroke-width: 2;' : ''}
-						on:dblclick={() => handleRectangleDoubleClick(rect.id)}
-						on:click={() => handleRectangleClick(rect.id)}
+						on:dblclick={(event) => handleRectangleDoubleClick(rect.id, event)}
+						on:click={(event) => handleRectangleClick(rect.id, event)}
 					/>
 				{/each}
 			</g>
