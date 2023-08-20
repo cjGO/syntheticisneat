@@ -3,8 +3,8 @@
 	import { scaleLinear } from 'd3-scale';
 	import AxisX from './AxisX.svelte';
 	import AxisY from './AxisY.svelte';
-  export let data;
-	import { filter_state, color_scheme, hovered_cat} from './czcell_stores';
+	export let data;
+	import { filter_state, color_scheme, hovered_cat } from './czcell_stores';
 
 	let isLoading = true;
 	let xScale;
@@ -16,8 +16,6 @@
 	const margin = { top: 20, right: 15, bottom: 20, left: 0 };
 	let innerWidth = width - margin.right - margin.left;
 	let innerHeight = height - margin.top - margin.bottom;
-
-
 
 	$: {
 		if (data.length > 0) {
@@ -46,42 +44,53 @@
 	let idCounter = 0;
 
 	function handleMouseDown(event) {
+		if (isDeleting) {
+        return;
+    }
+		if (isDisabled) {
+        return;
+    }
 		const rect = svgElement.getBoundingClientRect();
 		rectStart = { x: event.clientX - rect.left, y: event.clientY - rect.top };
 		rectangles.push({ id: idCounter++, start: rectStart, end: rectStart });
 	}
 
-  function handleMouseMove(event) {
-    const rect = svgElement.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    if (selectedRectangle !== null) {
-        const selectedRect = rectangles.find((rect) => rect.id === selectedRectangle);
-
-        // Check if selectedRect is not undefined
-        if (selectedRect) {
-            const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
-            const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
-
-            const dx = mouseX - oldCenterX;
-            const dy = mouseY - oldCenterY;
-
-            selectedRect.start.x += dx;
-            selectedRect.start.y += dy;
-            selectedRect.end.x += dx;
-            selectedRect.end.y += dy;
-
-            rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
-        }
-    } else if (rectStart) {
-        rectEnd = { x: mouseX, y: mouseY };
-        rectangles[rectangles.length - 1].end = rectEnd;
+	function handleMouseMove(event) {
+		if (isDisabled) {
+        return;
     }
-}
+		const rect = svgElement.getBoundingClientRect();
+		const mouseX = event.clientX - rect.left;
+		const mouseY = event.clientY - rect.top;
 
+		if (selectedRectangle !== null) {
+			const selectedRect = rectangles.find((rect) => rect.id === selectedRectangle);
+
+			// Check if selectedRect is not undefined
+			if (selectedRect) {
+				const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
+				const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
+
+				const dx = mouseX - oldCenterX;
+				const dy = mouseY - oldCenterY;
+
+				selectedRect.start.x += dx;
+				selectedRect.start.y += dy;
+				selectedRect.end.x += dx;
+				selectedRect.end.y += dy;
+
+				rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
+			}
+		} else if (rectStart) {
+			rectEnd = { x: mouseX, y: mouseY };
+			rectangles[rectangles.length - 1].end = rectEnd;
+		}
+	}
 
 	function handleMouseUp() {
+		if (isDisabled) {
+        return;
+    }
 		rectStart = null;
 
 		// Deselect any highlighted text
@@ -92,13 +101,20 @@
 			document.selection.empty();
 		}
 	}
+	let isDeleting = false;
 
-	function handleRectangleDoubleClick(id) {
-		console.log('id: ', id);
-		console.log('Double click: ', id);
-		rectangles = rectangles.filter((rect) => rect.id !== id);
-		console.log(rectangles);
-	}
+	let isDisabled = false;
+
+function handleRectangleDoubleClick(id) {
+    isDisabled = true;
+    isDeleting = true;
+    setTimeout(function () { 
+        rectangles = rectangles.filter((rect) => rect.id !== id);
+        isDeleting = false;
+        isDisabled = false;
+    }, 1000);
+}
+
 
 	let selectedRectangle = null;
 
@@ -144,14 +160,12 @@
 
 	let hover_category;
 	let hover_type;
-	$:{
-		hover_category = $hovered_cat[0]
-		hover_type = $hovered_cat[1]
-		console.log(hover_category)
+	$: {
+		hover_category = $hovered_cat[0];
+		hover_type = $hovered_cat[1];
+		console.log(hover_category);
 	}
 </script>
-
-
 
 {#if data && data.length > 0 && xScale && yScale && x_umapValues}
 	<div class="chart-container" bind:clientWidth={width} bind:clientHeight={height}>
@@ -167,16 +181,15 @@
 				<AxisX {xScale} height={innerHeight} width={innerWidth} />
 				<AxisY {yScale} width={innerWidth} />
 
-
 				{#each data as d}
 					<circle
 						cx={xScale(d.umap_x)}
 						cy={yScale(d.umap_y)}
-						r={(hover_category && d[hover_category] == hover_type) ? 5 : 1}
+						r={hover_category && d[hover_category] == hover_type ? 5 : 1}
 						fill="purple"
 					/>
 				{/each}
-				
+
 				{#each rectangles as rect (rect.id)}
 					<rect
 						x={Math.min(rect.start.x, rect.end.x)}

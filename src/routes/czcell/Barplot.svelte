@@ -6,14 +6,17 @@
 	let minVal = Math.min(...data);
 	let maxVal = Math.max(...data);
 	let binWidth = (maxVal - minVal) / n_bins;
+	let binIndexes = new Array(n_bins).fill().map(() => []); // Initialize binIndexes with empty arrays
 	let bins = new Array(n_bins).fill(0);
 
-	data.forEach((val) => {
-		let binIndex = Math.floor((val - minVal) / binWidth);
-		binIndex = binIndex === n_bins ? binIndex - 1 : binIndex; // Handle the edge case where the value is exactly equal to maxVal
-		bins[binIndex]++;
-	});
-	console.log(bins); // Outputs the counts in each bin
+
+data.forEach((val, idx) => {
+	let binIndex = Math.floor((val - minVal) / binWidth);
+	binIndex = binIndex === n_bins ? binIndex - 1 : binIndex;
+	bins[binIndex]++;
+	binIndexes[binIndex].push(idx); // Add the current index to the appropriate bin
+});
+
 
 	let width = 500;
 	let height = 350;
@@ -59,39 +62,42 @@ function updateSelection(event) {
     // Update bin colors
     selectionStart = Number(selectionBox.getAttribute('x'));
     let selectionEnd = selectionStart + Number(selectionBox.getAttribute('width'));
+    let selectedIndexes = []; // Initialize selectedIndexes
     for (let i = 0; i < n_bins; i++) {
         let bin = document.getElementById(`bin-${i}`);
         let binStart = Number(bin.getAttribute('x'));
         let binEnd = binStart + Number(bin.getAttribute('width'));
         if (binStart >= selectionStart && binEnd <= selectionEnd) {
             bin.setAttribute('fill', 'blue'); // set fill color to blue if bin is within selection
+            selectedIndexes.push(...binIndexes[i]); // Add the indexes of this bin to selectedIndexes
         } else {
             bin.setAttribute('fill', 'black'); // set fill color to black if bin is not within selection
         }
     }
+    // Removed console log from here
 }
 
-
-
-	function endSelection() {
-		selecting = false;
+function endSelection() {
+    selecting = false;
     dragging = false;
-		let selectionBox = document.getElementById('selectionBox');
-		let selectionStart = Number(selectionBox.getAttribute('x'));
-		let selectionEnd = selectionStart + Number(selectionBox.getAttribute('width'));
+    let selectionBox = document.getElementById('selectionBox');
+    let selectionStart = Number(selectionBox.getAttribute('x'));
+    let selectionEnd = selectionStart + Number(selectionBox.getAttribute('width'));
 
-		for (let i = 0; i < n_bins; i++) {
-			let bin = document.getElementById(`bin-${i}`);
-			let binStart = Number(bin.getAttribute('x'));
-			let binEnd = binStart + Number(bin.getAttribute('width'));
-
-			if (binStart >= selectionStart && binEnd <= selectionEnd) {
-				bin.setAttribute('fill', 'blue'); // set fill color to blue if bin is within selection
-			} else {
-				bin.setAttribute('fill', 'black'); // set fill color to black if bin is not within selection
-			}
-		}
-	}
+    let selectedIndexes = []; // Initialize selectedIndexes
+    for (let i = 0; i < n_bins; i++) {
+        let bin = document.getElementById(`bin-${i}`);
+        let binStart = Number(bin.getAttribute('x'));
+        let binEnd = binStart + Number(bin.getAttribute('width'));
+        if (binStart >= selectionStart && binEnd <= selectionEnd) {
+            bin.setAttribute('fill', 'blue'); // set fill color to blue if bin is within selection
+            selectedIndexes.push(...binIndexes[i]); // Add the indexes of this bin to selectedIndexes
+        } else {
+            bin.setAttribute('fill', 'black'); // set fill color to black if bin is not within selection
+        }
+    }
+    console.log(selectedIndexes); // Moved console log to here
+}
 </script>
 
 <svg
