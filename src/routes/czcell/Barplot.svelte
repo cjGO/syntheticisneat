@@ -18,8 +18,8 @@
 		bins[binIndex].indexes.push(idx); // Add the current index to the appropriate bin
 	});
 
-	let width = 500;
-	let height = 350;
+	let width = 250;
+	let height = 150;
 
 	let yScale = scaleLinear()
 		.domain([0, Math.max(...bins.map((bin) => bin.count))])

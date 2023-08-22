@@ -19,20 +19,16 @@
 
 	$: {
 		if (data.length > 0) {
-
-
-
-		if ($filter_state && data) {
-			filtered_data = data.filter((item) => {
-				for (let key in $filter_state) {
-					if (!$filter_state[key].values[item[key]].filter) {
-						return false;
+			if ($filter_state && data) {
+				filtered_data = data.filter((item) => {
+					for (let key in $filter_state) {
+						if (!$filter_state[key].values[item[key]].filter) {
+							return false;
+						}
 					}
-				}
-				return true;
-			});
-		}
-	
+					return true;
+				});
+			}
 
 			x_umapValues = filtered_data.map((obj) => obj.umap_x);
 			xScale = scaleLinear()
@@ -123,34 +119,32 @@
 	let selectedRectangle = null;
 
 	function handleRectangleClick(id, event) {
-    event.stopPropagation();
-    if (selectedRectangle === id) {
-        selectedRectangle = null;
-    } else {
-        selectedRectangle = id;
-        const selectedRect = rectangles.find((rect) => rect.id === selectedRectangle);
-        if (selectedRect) {
-            const rect = svgElement.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
-            const mouseY = event.clientY - rect.top;
+		event.stopPropagation();
+		if (selectedRectangle === id) {
+			selectedRectangle = null;
+		} else {
+			selectedRectangle = id;
+			const selectedRect = rectangles.find((rect) => rect.id === selectedRectangle);
+			if (selectedRect) {
+				const rect = svgElement.getBoundingClientRect();
+				const mouseX = event.clientX - rect.left;
+				const mouseY = event.clientY - rect.top;
 
-            const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
-            const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
+				const oldCenterX = (selectedRect.start.x + selectedRect.end.x) / 2;
+				const oldCenterY = (selectedRect.start.y + selectedRect.end.y) / 2;
 
-            const dx = mouseX - oldCenterX;
-            const dy = mouseY - oldCenterY;
+				const dx = mouseX - oldCenterX;
+				const dy = mouseY - oldCenterY;
 
-            selectedRect.start.x += dx;
-            selectedRect.start.y += dy;
-            selectedRect.end.x += dx;
-            selectedRect.end.y += dy;
+				selectedRect.start.x += dx;
+				selectedRect.start.y += dy;
+				selectedRect.end.x += dx;
+				selectedRect.end.y += dy;
 
-            rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
-        }
-    }
-}
-
-
+				rectangles = [...rectangles]; // This line will trigger Svelte's reactivity system
+			}
+		}
+	}
 
 	function handleRectangleDoubleClick(id, event) {
 		event.stopPropagation();
@@ -159,8 +153,10 @@
 		setTimeout(function () {
 			rectangles = rectangles.filter((rect) => rect.id !== id);
 			isDeleting = false;
+		}, 122); // Time to delete a rectangle
+		setTimeout(function () {
 			isDisabled = false;
-		}, 122);
+		}, 200); // Time to disable mouse events
 		console.log('deleted');
 	}
 
@@ -220,7 +216,7 @@
 
 				{#each filtered_data as d}
 					<circle
-						cx={xScale(d.umap_x)}	
+						cx={xScale(d.umap_x)}
 						cy={yScale(d.umap_y)}
 						r={hover_category && d[hover_category] == hover_type ? 5 : 1}
 						fill="purple"

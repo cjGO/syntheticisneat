@@ -52,16 +52,19 @@
 					<FilterSidebar {key} {value} />
 				</div>
 			{/each}
-			<!-- {#each Object.keys($filter_cont) as continuous_key, i}
-				<Barplot
-					id={`barplot-${i}`}
-					data={Object.entries(data).map(([key, value]) => value[continuous_key])}
-					width={sidebarWidth}
-				/>
-			{/each} -->
-			<Barplot data={Object.entries(data).map(([key, value]) => value.percent_rb)} />
-			<Barplot data={Object.entries(data).map(([key, value]) => value.donor_BMI_at_collection)} />
+			{#each Object.keys($filter_cont) as continuous_key, i}
+				<div class="barplot-container">
+					<Barplot
+						id={`barplot-${i}`}
+						data={Object.entries(data).map(([key, value]) => value[continuous_key])}
+						width={sidebarWidth}
+					/>
+					<p class="barplot-label">{continuous_key}</p>
+				</div>
+			{/each}
 
+			<!-- <Barplot data={Object.entries(data).map(([key, value]) => value.percent_rb)} />
+			<Barplot data={Object.entries(data).map(([key, value]) => value.donor_BMI_at_collection)} /> -->
 		</div>
 		<div class="scatter">
 			<SingleCellScatter {data} />
@@ -79,5 +82,15 @@
 	}
 	.scatter {
 		flex: 4;
+	}
+
+	.barplot-container {
+		border: 1px solid #000;
+		box-sizing: border-box;
+	}
+	.barplot-label {
+		text-align: center;
+		font-weight: bold;
+		margin-top: 10px;
 	}
 </style>
