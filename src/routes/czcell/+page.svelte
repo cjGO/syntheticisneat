@@ -40,13 +40,15 @@
 	});
 </script>
 
-<p> 
-	This is a recreation of 
-	<a href="https://cellxgene.cziscience.com/e/c8d40d53-387b-48f2-9f89-72bfdb9c7c9f.cxg/">cellxgene</a> 
-	using 
-	<a href="https://svelte.dev/">Svelte.js</a> 
-	and 
-	<a href="https://d3js.org/">D3.js</a> 
+<p>
+	This is a recreation of
+	<a href="https://cellxgene.cziscience.com/e/c8d40d53-387b-48f2-9f89-72bfdb9c7c9f.cxg/"
+		>cellxgene</a
+	>
+	using
+	<a href="https://svelte.dev/">Svelte.js</a>
+	and
+	<a href="https://d3js.org/">D3.js</a>
 </p>
 {#if isLoading}
 	<p>Loading...</p>
@@ -84,12 +86,16 @@
 <style>
 	.container {
 		display: flex;
+		height: var(--remaining-height);
 	}
+
 	.sidebar {
 		flex: 1;
+		overflow-y: auto;
 	}
+
 	.scatter {
-		flex: 4;
+		flex: 6;
 	}
 
 	.barplot-container {

@@ -3,7 +3,7 @@
 	let selectionBox;
 
 	export let data; // an array of floats
-	let n_bins = 100;
+	let n_bins = 50;
 	let minVal = Math.min(...data);
 	let maxVal = Math.max(...data);
 	let binWidth = (maxVal - minVal) / n_bins;
