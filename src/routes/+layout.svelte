@@ -1,13 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
-
 	let currentPage = '/';
-	let headerHeight;
-	onMount(() => {
-		headerHeight = document.querySelector('header').offsetHeight;
-		let remainingHeight = `calc(100vh - ${headerHeight}px)`;
-		document.documentElement.style.setProperty('--remaining-height', remainingHeight);
-	});
 
 	let text = 'S Y N T H E T I C - I S - N E A T';
 	let greenIndex = 0;
@@ -35,9 +27,7 @@
 	>
 </nav>
 
-<div style="height: var(--remaining-height);">
-	<slot />
-</div>
+<slot />
 
 <style>
 	.header {
@@ -62,11 +52,5 @@
 
 	.green {
 		color: darkgreen;
-	}
-
-	:global(html, body) {
-		height: 100%;
-		margin: 0;
-		padding: 0;
 	}
 </style>

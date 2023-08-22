@@ -86,7 +86,7 @@
 <style>
 	.container {
 		display: flex;
-		height: var(--remaining-height);
+		height: 80vh;
 	}
 
 	.sidebar {
@@ -95,7 +95,7 @@
 	}
 
 	.scatter {
-		flex: 6;
+		flex: 4;
 	}
 
 	.barplot-container {

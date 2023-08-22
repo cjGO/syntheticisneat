@@ -247,6 +247,6 @@
 		fill: hsla(212, 10%, 53%, 1); /* The color of our text */
 	}
 	.chart-container {
-		height: 100vh; /* Set the height to 100% of the viewport height */
+		height: 80vh; /* Set the height to 100% of the viewport height */
 	}
 </style>
