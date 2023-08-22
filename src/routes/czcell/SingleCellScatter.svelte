@@ -220,7 +220,7 @@
 
 				{#each filtered_data as d}
 					<circle
-						cx={xScale(d.umap_x)}
+						cx={xScale(d.umap_x)}	
 						cy={yScale(d.umap_y)}
 						r={hover_category && d[hover_category] == hover_type ? 5 : 1}
 						fill="purple"

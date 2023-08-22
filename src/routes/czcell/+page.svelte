@@ -1,15 +1,17 @@
 <script>
 	import SingleCellScatter from './SingleCellScatter.svelte';
 	import FilterSidebar from './FilterSidebar.svelte';
-	import { onMount } from 'svelte';
-	import { summarizeKeys } from './sc_helpers';
+	import { onMount, onDestroy } from 'svelte';
+	import { summarizeKeys, getContinuous } from './sc_helpers';
 	import Barplot from './Barplot.svelte';
-	import { filter_state, color_scheme } from './czcell_stores';
+	import { filter_state, filter_cont } from './czcell_stores';
 
 	let isLoading = true;
 	let data;
 	let filter_categorys;
 	let filteredData;
+	let sidebarWidth;
+	let resizeObserver;
 
 	const endpoint = 'https://api.syntheticisneat.com/random_annotations/';
 
@@ -17,24 +19,25 @@
 		const response = await fetch(endpoint);
 		data = await response.json();
 		console.log(data);
-		filter_categorys = summarizeKeys(data);
-		let keysArray = Object.keys(filter_categorys);
-		$filter_state = filter_categorys;
+		$filter_cont = getContinuous(data);
+		$filter_state = summarizeKeys(data);
+		console.log($filter_cont);
 		isLoading = false;
+
+		resizeObserver = new ResizeObserver((entries) => {
+			for (let entry of entries) {
+				sidebarWidth = entry.contentRect.width;
+			}
+		});
+
+		resizeObserver.observe(document.querySelector('.sidebar'));
 	});
 
-	$: {
-		if ($filter_state && data) {
-			filteredData = data.filter((item) => {
-				for (let key in $filter_state) {
-					if (!$filter_state[key].values[item[key]].filter) {
-						return false;
-					}
-				}
-				return true;
-			});
+	onDestroy(() => {
+		if (resizeObserver) {
+			resizeObserver.disconnect();
 		}
-	}
+	});
 </script>
 
 {#if isLoading}
@@ -42,17 +45,27 @@
 {/if}
 
 {#if data}
-	<Barplot data={Object.entries(data).map(([key, value]) => value.n_count_rna)} />
 	<div class="container">
 		<div class="sidebar">
-			{#each Object.entries(filter_categorys) as [key, value]}
+			{#each Object.entries($filter_state) as [key, value]}
 				<div>
 					<FilterSidebar {key} {value} />
 				</div>
 			{/each}
+			<!-- {#each Object.keys($filter_cont) as continuous_key, i}
+				<Barplot
+					id={`barplot-${i}`}
+					data={Object.entries(data).map(([key, value]) => value[continuous_key])}
+					width={sidebarWidth}
+				/>
+			{/each} -->
+			<Barplot data={Object.entries(data).map(([key, value]) => value.percent_rb)} />
+			<Barplot data={Object.entries(data).map(([key, value]) => value.donor_BMI_at_collection)} />
+
 		</div>
 		<div class="scatter">
 			<SingleCellScatter {data} />
+			<br />
 		</div>
 	</div>
 {/if}
