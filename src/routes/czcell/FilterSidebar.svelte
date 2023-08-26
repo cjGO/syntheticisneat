@@ -19,6 +19,19 @@
 	function clearHoveredCat() {
 	$hovered_cat = ['',''];
 }
+
+$: if ($color_scheme !== key) {
+		value.color_scale = false;
+	} else {
+		console.log($color_scheme)
+		value.color_scale = true;
+	}
+
+
+	function handleCheckboxClick() {
+		$color_scheme = key;
+	}
+
 </script>
 
 <div class="container">
@@ -29,7 +42,7 @@
 			{is_collapsed ? '⇩' : '⇨'}
 		</button>
 	</div>
-	<input type="checkbox" id="checkbox2" name="color" bind:checked={value.color_scale} />
+	<input type="checkbox" id="color_box" name="color" bind:checked={value.color_scale} on:click={handleCheckboxClick} />
 </div>
 
 {#if is_collapsed}

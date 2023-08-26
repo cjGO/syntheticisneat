@@ -4,7 +4,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { summarizeKeys, getContinuous } from './sc_helpers';
 	import Barplot from './Barplot.svelte';
-	import { filter_state, filter_cont } from './czcell_stores';
+	import { filter_state, continuous_variables } from './czcell_stores';
 
 	let isLoading = true;
 	let data;
@@ -19,24 +19,14 @@
 		const response = await fetch(endpoint);
 		data = await response.json();
 		console.log(data);
-		$filter_cont = getContinuous(data);
+		$continuous_variables = getContinuous(data);
 		$filter_state = summarizeKeys(data);
-		console.log($filter_cont);
+		console.log($filter_state);
 		isLoading = false;
 
-		resizeObserver = new ResizeObserver((entries) => {
-			for (let entry of entries) {
-				sidebarWidth = entry.contentRect.width;
-			}
-		});
 
-		resizeObserver.observe(document.querySelector('.sidebar'));
-	});
 
-	onDestroy(() => {
-		if (resizeObserver) {
-			resizeObserver.disconnect();
-		}
+
 	});
 </script>
 
@@ -62,12 +52,10 @@
 					<FilterSidebar {key} {value} />
 				</div>
 			{/each}
-			{#each Object.keys($filter_cont) as continuous_key, i}
+			{#each Object.keys($continuous_variables) as continuous_key, i}
 				<div class="barplot-container">
 					<Barplot
-						id={`barplot-${i}`}
 						data={Object.entries(data).map(([key, value]) => value[continuous_key])}
-						width={sidebarWidth}
 					/>
 					<p class="barplot-label">{continuous_key}</p>
 				</div>
@@ -103,6 +91,7 @@
 		box-sizing: border-box;
 	}
 	.barplot-label {
+		
 		text-align: center;
 		font-weight: bold;
 		margin-top: 10px;
