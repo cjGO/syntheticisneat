@@ -66,13 +66,16 @@
 <!-- <div style="width: 25%; height: 10; overflow: auto;">
 	<Highlighter />
 </div> -->
+
 {#if isLoading}
 	<p>Loading...</p>
 {:else if protein_umap.length === 0}
 	<p>No data available.</p>
 {/if}
 <Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
-<p> Click a protein point to turn it red to view the amino acid UMAP for that protein below! </p> 
+<p> Click a protein point to turn it red to view the amino acid UMAP for that protein below! </p>
+<p> This is an app to explore ~700 proteins BLASTed from the nicotine biosynthesis pathway. It uses <a href="https://github.com/facebookresearch/esm">Meta's ESM-2 models</a> to explore the internal representations of each protein and each amino acid within particular proteins.</p>
+
 <div class="container">
 	{#if !isLoading}
 		<div class="scatterplot">

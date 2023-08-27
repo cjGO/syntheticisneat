@@ -28,6 +28,9 @@
 					}
 					return true;
 				});
+
+			/// add logic to create the color_array for filtered_data.
+			// this reactive statement also must run when $color_scheme changes
 			}
 
 			x_umapValues = filtered_data.map((obj) => obj.umap_x);
@@ -147,18 +150,17 @@
 	}
 
 	function handleRectangleDoubleClick(id, event) {
-		event.stopPropagation();
-		isDisabled = true;
-		isDeleting = true;
-		setTimeout(function () {
-			rectangles = rectangles.filter((rect) => rect.id !== id);
-			isDeleting = false;
-		}, 122); // Time to delete a rectangle
-		setTimeout(function () {
-			isDisabled = false;
-		}, 200); // Time to disable mouse events
-		console.log('deleted');
-	}
+	event.stopPropagation();
+	isDisabled = true;
+	isDeleting = true;
+	setTimeout(function () {
+		rectangles = rectangles.filter((rect) => rect.id !== id);
+		isDeleting = false;
+		isDisabled = false; // Set isDisabled back to false immediately after deleting a rectangle
+	}, 122); // Time to delete a rectangle
+	console.log('deleted');
+}
+
 
 	function getPointsInRectangles(filtered_data, rectangles) {
 		let pointsInRectangles = rectangles.map((rect) => {
@@ -187,10 +189,11 @@
 
 	let pointsInRectangles = [];
 
-	$: {
-		pointsInRectangles = getPointsInRectangles(filtered_data, rectangles);
-		// console.log(pointsInRectangles);
-	}
+	$:  {
+  pointsInRectangles = getPointsInRectangles(filtered_data, rectangles);
+//   console.log(pointsInRectangles);
+}
+
 
 	let hover_category;
 	let hover_type;
