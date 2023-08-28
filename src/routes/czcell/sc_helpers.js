@@ -59,3 +59,17 @@ export function getContinuous(arrayOfObjects) {
 
     return summary;
 }
+
+
+
+export function generateColors(numColors) {
+    var colors = [];
+    for (var i = 0; i < numColors; i++) {
+        // generate hue between 0 and 360
+        var hue = Math.floor(360 * i / numColors);
+        // create hsl color string
+        var color = 'hsl(' + hue + ', 100%, 50%)';
+        colors.push(color);
+    }
+    return colors;
+}

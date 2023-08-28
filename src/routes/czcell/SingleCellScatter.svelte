@@ -5,6 +5,7 @@
 	import AxisY from './AxisY.svelte';
 	export let data;
 	import { filter_state, color_scheme, hovered_cat } from './czcell_stores';
+	import { generateColors } from './sc_helpers';
 
 	let isLoading = true;
 	let xScale;
@@ -16,6 +17,17 @@
 	const margin = { top: 20, right: 15, bottom: 20, left: 0 };
 	let innerWidth = width - margin.right - margin.left;
 	let innerHeight = height - margin.top - margin.bottom;
+
+			let tissueLocations = filtered_data.map(obj => obj.tissue_location);
+			let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
+			let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
+			let number_colors = new Set(category_ids).size
+			let colors = (generateColors(number_colors))
+			console.log(colors)
+			console.log(category_ids)
+			var color_array = category_ids.map(index => colors[index]);
+
+console.log(color_array);
 
 	$: {
 		if (data.length > 0) {
@@ -29,8 +41,23 @@
 					return true;
 				});
 
+
 			/// add logic to create the color_array for filtered_data.
 			// this reactive statement also must run when $color_scheme changes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			}
 
 			x_umapValues = filtered_data.map((obj) => obj.umap_x);
@@ -217,12 +244,13 @@
 				<AxisX {xScale} height={innerHeight} width={innerWidth} />
 				<AxisY {yScale} width={innerWidth} />
 
-				{#each filtered_data as d}
+				{#each filtered_data as d, i (d.id)}
+				{console.log(d.id)}
 					<circle
 						cx={xScale(d.umap_x)}
 						cy={yScale(d.umap_y)}
-						r={hover_category && d[hover_category] == hover_type ? 5 : 1}
-						fill="purple"
+						r={hover_category && d[hover_category] == hover_type ? 5 : 3}
+						fill={color_array[i]}
 					/>
 				{/each}
 
