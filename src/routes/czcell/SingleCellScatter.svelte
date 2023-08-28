@@ -18,16 +18,17 @@
 	let innerWidth = width - margin.right - margin.left;
 	let innerHeight = height - margin.top - margin.bottom;
 
-			let tissueLocations = filtered_data.map(obj => obj.tissue_location);
-			let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
-			let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
-			let number_colors = new Set(category_ids).size
-			let colors = (generateColors(number_colors))
-			console.log(colors)
-			console.log(category_ids)
-			var color_array = category_ids.map(index => colors[index]);
+	let color_array;
 
-console.log(color_array);
+			// let tissueLocations = filtered_data.map(obj => obj.tissue_location);
+			// let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
+			// let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
+			// let number_colors = new Set(category_ids).size
+			// let colors = (generateColors(number_colors))
+			// console.log(colors)
+			// console.log(category_ids)
+			// var color_array = category_ids.map(index => colors[index]);
+
 
 	$: {
 		if (data.length > 0) {
@@ -41,21 +42,22 @@ console.log(color_array);
 					return true;
 				});
 
+				if ($color_scheme && $color_scheme.length) {
+					console.log('running color_scheme')
+					console.log($color_scheme)
+								let tissueLocations = filtered_data.map(obj => obj.tissue_location);
+			let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
+			let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
+			let number_colors = new Set(category_ids).size
+			let colors = (generateColors(number_colors))
+			color_array = category_ids.map(index => colors[index]);
+				} else {
+    color_array = null;
+}
+
 
 			/// add logic to create the color_array for filtered_data.
-			// this reactive statement also must run when $color_scheme changes
-
-
-
-
-
-
-
-
-
-
-
-
+			// this reactive statement also must run when $color_scheme change
 
 
 			}
@@ -71,6 +73,7 @@ console.log(color_array);
 				.range([innerHeight, 0]);
 		}
 	}
+
 	$: {
 		innerWidth = width - margin.right - margin.left;
 		innerHeight = height - margin.top - margin.bottom;
@@ -245,14 +248,14 @@ console.log(color_array);
 				<AxisY {yScale} width={innerWidth} />
 
 				{#each filtered_data as d, i (d.id)}
-				{console.log(d.id)}
-					<circle
-						cx={xScale(d.umap_x)}
-						cy={yScale(d.umap_y)}
-						r={hover_category && d[hover_category] == hover_type ? 5 : 3}
-						fill={color_array[i]}
-					/>
-				{/each}
+				<circle
+					cx={xScale(d.umap_x)}
+					cy={yScale(d.umap_y)}
+					r={hover_category && d[hover_category] == hover_type ? 5 : 3}
+					fill={color_array && color_array[i] ? color_array[i] : 'black'}
+				/>
+			{/each}
+			
 
 				{#each rectangles as rect (rect.id)}
 					<rect

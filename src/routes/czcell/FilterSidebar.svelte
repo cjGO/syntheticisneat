@@ -23,14 +23,19 @@
 $: if ($color_scheme !== key) {
 		value.color_scale = false;
 	} else {
-		console.log($color_scheme)
 		value.color_scale = true;
 	}
 
 
 	function handleCheckboxClick() {
-		$color_scheme = key;
-	}
+    if (value.color_scale) {
+        $color_scheme = null;
+		console.log($color_scheme)
+    } else {
+        $color_scheme = key;
+    }
+}
+
 
 </script>
 
