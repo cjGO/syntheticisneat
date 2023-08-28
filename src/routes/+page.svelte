@@ -74,6 +74,7 @@
 {/if}
 <p> Click a protein point to turn it red to view the amino acid UMAP for that protein below! </p>
 <p> This is an app to explore ~700 proteins BLASTed from the nicotine biosynthesis pathway. It uses <a href="https://github.com/facebookresearch/esm">Meta's ESM-2 models</a> to explore the internal representations of each protein and each amino acid within particular proteins.</p>
+<Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
 
 <div class="container">
 	{#if !isLoading}
@@ -81,7 +82,6 @@
 			<Scatterplot {protein_umap} meta={protein_meta} />
 		</div>
 	{/if}
-	<Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
 
 	<div class="hovered-data-container">
 		<HoveredData
