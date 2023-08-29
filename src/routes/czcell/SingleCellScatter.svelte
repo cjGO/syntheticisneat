@@ -48,7 +48,8 @@
 								let tissueLocations = filtered_data.map(obj => obj[$color_scheme]);
 			let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
 			console.log(uniqueTissueLocations)
-			let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj[$color_scheme]));
+			
+			let category_ids = filtered_data.map(obj => uniqueTissueLocations.indexOf(obj[$color_scheme]));
 			let number_colors = new Set(category_ids).size
 			let colors = (generateColors(number_colors))
 			console.log(category_ids)
