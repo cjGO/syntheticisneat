@@ -45,11 +45,13 @@
 				if ($color_scheme && $color_scheme.length) {
 					console.log('running color_scheme')
 					console.log($color_scheme)
-								let tissueLocations = filtered_data.map(obj => obj.tissue_location);
+								let tissueLocations = filtered_data.map(obj => obj[$color_scheme]);
 			let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
-			let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
+			console.log(uniqueTissueLocations)
+			let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj[$color_scheme]));
 			let number_colors = new Set(category_ids).size
 			let colors = (generateColors(number_colors))
+			console.log(category_ids)
 			color_array = category_ids.map(index => colors[index]);
 				} else {
     color_array = null;
