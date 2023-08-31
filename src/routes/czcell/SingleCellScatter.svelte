@@ -4,7 +4,7 @@
 	import AxisX from './AxisX.svelte';
 	import AxisY from './AxisY.svelte';
 	export let data;
-	import { filter_state, color_scheme, hovered_cat } from './czcell_stores';
+	import { filter_state, color_scheme, hovered_cat, color_cats } from './czcell_stores';
 	import { generateColors } from './sc_helpers';
 
 	let isLoading = true;
@@ -20,15 +20,14 @@
 
 	let color_array;
 
-			// let tissueLocations = filtered_data.map(obj => obj.tissue_location);
-			// let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
-			// let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
-			// let number_colors = new Set(category_ids).size
-			// let colors = (generateColors(number_colors))
-			// console.log(colors)
-			// console.log(category_ids)
-			// var color_array = category_ids.map(index => colors[index]);
-
+	// let tissueLocations = filtered_data.map(obj => obj.tissue_location);
+	// let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
+	// let category_ids = data.map(obj => uniqueTissueLocations.indexOf(obj.tissue_location));
+	// let number_colors = new Set(category_ids).size
+	// let colors = (generateColors(number_colors))
+	// console.log(colors)
+	// console.log(category_ids)
+	// var color_array = category_ids.map(index => colors[index]);
 
 	$: {
 		if (data.length > 0) {
@@ -43,26 +42,29 @@
 				});
 
 				if ($color_scheme && $color_scheme.length) {
-					console.log('running color_scheme')
-					console.log($color_scheme)
-								let tissueLocations = filtered_data.map(obj => obj[$color_scheme]);
-			let uniqueTissueLocations = tissueLocations.filter((value, index, self) => self.indexOf(value) === index);
-			console.log(uniqueTissueLocations)
-			
-			let category_ids = filtered_data.map(obj => uniqueTissueLocations.indexOf(obj[$color_scheme]));
-			let number_colors = new Set(category_ids).size
-			let colors = (generateColors(number_colors))
-			console.log(category_ids)
-			color_array = category_ids.map(index => colors[index]);
+					console.log('running color_scheme');
+					console.log($color_scheme);
+					let tissueLocations = filtered_data.map((obj) => obj[$color_scheme]);
+					let uniqueTissueLocations = tissueLocations.filter(
+						(value, index, self) => self.indexOf(value) === index
+					);
+					console.log(uniqueTissueLocations);
+
+					let category_ids = filtered_data.map((obj) =>
+						uniqueTissueLocations.indexOf(obj[$color_scheme])
+					);
+					let number_colors = new Set(category_ids).size;
+					let colors = generateColors(number_colors);
+					console.log(category_ids);
+					color_array = category_ids.map((index) => colors[index]);
+					$color_cats = color_array;
 				} else {
-    color_array = null;
-}
+					color_array = null;
+					$color_cats = null;
+				}
 
-
-			/// add logic to create the color_array for filtered_data.
-			// this reactive statement also must run when $color_scheme change
-
-
+				/// add logic to create the color_array for filtered_data.
+				// this reactive statement also must run when $color_scheme change
 			}
 
 			x_umapValues = filtered_data.map((obj) => obj.umap_x);
@@ -183,17 +185,16 @@
 	}
 
 	function handleRectangleDoubleClick(id, event) {
-	event.stopPropagation();
-	isDisabled = true;
-	isDeleting = true;
-	setTimeout(function () {
-		rectangles = rectangles.filter((rect) => rect.id !== id);
-		isDeleting = false;
-		isDisabled = false; // Set isDisabled back to false immediately after deleting a rectangle
-	}, 122); // Time to delete a rectangle
-	console.log('deleted');
-}
-
+		event.stopPropagation();
+		isDisabled = true;
+		isDeleting = true;
+		setTimeout(function () {
+			rectangles = rectangles.filter((rect) => rect.id !== id);
+			isDeleting = false;
+			isDisabled = false; // Set isDisabled back to false immediately after deleting a rectangle
+		}, 122); // Time to delete a rectangle
+		console.log('deleted');
+	}
 
 	function getPointsInRectangles(filtered_data, rectangles) {
 		let pointsInRectangles = rectangles.map((rect) => {
@@ -222,11 +223,10 @@
 
 	let pointsInRectangles = [];
 
-	$:  {
-  pointsInRectangles = getPointsInRectangles(filtered_data, rectangles);
-//   console.log(pointsInRectangles);
-}
-
+	$: {
+		pointsInRectangles = getPointsInRectangles(filtered_data, rectangles);
+		//   console.log(pointsInRectangles);
+	}
 
 	let hover_category;
 	let hover_type;
@@ -251,14 +251,13 @@
 				<AxisY {yScale} width={innerWidth} />
 
 				{#each filtered_data as d, i (d.id)}
-				<circle
-					cx={xScale(d.umap_x)}
-					cy={yScale(d.umap_y)}
-					r={hover_category && d[hover_category] == hover_type ? 5 : 3}
-					fill={color_array && color_array[i] ? color_array[i] : 'black'}
-				/>
-			{/each}
-			
+					<circle
+						cx={xScale(d.umap_x)}
+						cy={yScale(d.umap_y)}
+						r={hover_category && d[hover_category] == hover_type ? 5 : 3}
+						fill={color_array && color_array[i] ? color_array[i] : 'black'}
+					/>
+				{/each}
 
 				{#each rectangles as rect (rect.id)}
 					<rect
