@@ -1,6 +1,13 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
+  3dmol:
+    specifier: ^2.0.3
+    version: 2.0.3
   d3:
     specifier: ^7.8.5
     version: 7.8.5
@@ -62,6 +69,16 @@ devDependencies:
     version: 0.25.8
 
 packages:
+
+  /3dmol@2.0.3:
+    resolution: {integrity: sha512-1O7AIUN65uuE8RF8ZKC2sD2pLo7SZbsIMNnA3EqeRtK1+xkmnGoybgnOLwuNMmM5EN97EXs/WgPpNsXGSautFw==}
+    engines: {node: '>=16.16.0', npm: '>=8.11'}
+    dependencies:
+      iobuffer: 5.3.2
+      netcdfjs: 2.0.2
+      pako: 2.1.0
+      upng-js: 2.1.0
+    dev: false
 
   /@esbuild/android-arm64@0.16.6:
     resolution: {integrity: sha512-5mSVUNQoEpnvWBgMnEKlHGjrK/3kqRoj+YkErK+RbKMlxCGzzkqh+vSGY0pq+RCobAXs0BlBQMQ+8ZutAkyStw==}
@@ -1419,6 +1436,10 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /iobuffer@5.3.2:
+    resolution: {integrity: sha512-kO3CjNfLZ9t+tHxAMd+Xk4v3D/31E91rMs1dHrm7ikEQrlZ8mLDbQ4z3tZfDM48zOkReas2jx8MWSAmN9+c8Fw==}
+    dev: false
+
   /is-any-array@0.1.1:
     resolution: {integrity: sha512-qTiELO+kpTKqPgxPYbshMERlzaFu29JDnpB8s3bjg+JkxBpw29/qqSaOdKv2pCdaG92rLGeG/zG2GauX58hfoA==}
     dev: false
@@ -1679,6 +1700,12 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
+  /netcdfjs@2.0.2:
+    resolution: {integrity: sha512-Uyz+3rqdF3D4WhnQY3lmG/FBY53OsDfloYnjBhoG+jZZs25RXWIOVU8d+V852Kv0xgtt1MzaSdeYmUS9enJ+ow==}
+    dependencies:
+      iobuffer: 5.3.2
+    dev: false
+
   /node-fetch@2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
     engines: {node: 4.x || >=6.0.0}
@@ -1754,6 +1781,14 @@ packages:
     dependencies:
       p-limit: 3.1.0
     dev: true
+
+  /pako@1.0.11:
+    resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
+    dev: false
+
+  /pako@2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
+    dev: false
 
   /parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
@@ -2253,6 +2288,12 @@ packages:
     dependencies:
       busboy: 1.6.0
     dev: true
+
+  /upng-js@2.1.0:
+    resolution: {integrity: sha512-d3xzZzpMP64YkjP5pr8gNyvBt7dLk/uGI67EctzDuVp4lCZyVMo0aJO6l/VDlgbInJYDY6cnClLoBp29eKWI6g==}
+    dependencies:
+      pako: 1.0.11
+    dev: false
 
   /uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
