@@ -3,6 +3,7 @@
 	import Scatterplot from './Scatterplot.svelte';
 	import AAscatter from './AAscatter.svelte';
 	import Switcher from '../components/Switcher.svelte';
+	import ViewerProtein from '../components/ViewerProtein.svelte';
 	import {
 		selectedPoint,
 		hoveredPoint,
@@ -59,6 +60,7 @@
 		$highlightedIndex = null;
 		// $selectedProtein = protein_meta.find((protein) => protein.id === currentPoint);
 		$selectedProtein = protein_meta[currentPoint];
+		console.log({'SELECTEDPROTEIN':$selectedProtein['primary_accession']})
 		// https://api.syntheticisneat.com/amino_acid_embedding/protein/1
 	}
 </script>
@@ -72,8 +74,12 @@
 {:else if protein_umap.length === 0}
 	<p>No data available.</p>
 {/if}
-<p> Click a protein point to turn it red to view the amino acid UMAP for that protein below! </p>
-<p> This is an app to explore ~700 proteins BLASTed from the nicotine biosynthesis pathway. It uses <a href="https://github.com/facebookresearch/esm">Meta's ESM-2 models</a> to explore the internal representations of each protein and each amino acid within particular proteins.</p>
+<p>Click a protein point to turn it red to view the amino acid UMAP for that protein below!</p>
+<p>
+	This is an app to explore ~700 proteins BLASTed from the nicotine biosynthesis pathway. It uses <a
+		href="https://github.com/facebookresearch/esm">Meta's ESM-2 models</a
+	> to explore the internal representations of each protein and each amino acid within particular proteins.
+</p>
 <Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
 
 <div class="container">
@@ -110,11 +116,10 @@
 				umapLoading = false; // Set umapLoading to false when fetch breaks
 			});
 	}}
-	disabled={umapLoading || currentPoint === null} 
-		>
+	disabled={umapLoading || currentPoint === null}
+>
 	Run UMAP (~15 seconds)
 </button>
-
 
 <Switcher arg1={'Click: Showing Small Model'} arg2={'Click: Showing Big Model'} />
 
@@ -123,10 +128,12 @@
 		<div class="item">
 			<AAscatter {selected_protein} />
 		</div>
+		<div class="viewer">
+			<ViewerProtein pdbId={$selectedProtein['primary_accession']} />
+		</div>
 		<div class="highlighter">
 			<Highlighter protein_sequence={protein_meta[$selectedPoint].sequence} />
-
-					</div>
+		</div>
 	{/if}
 </div>
 
@@ -136,6 +143,17 @@
 	.container {
 		display: flex;
 		height: 100vh; /* Full height */
+	}
+	.viewer {
+		position: relative;
+		flex: 1;
+		margin: 0 10px;
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		overflow: auto;
+		max-width: 100%;
+		height: 100%;
+		width: 100%;
 	}
 
 	.scatterplot {
@@ -159,5 +177,6 @@
 		overflow: auto; /* Add a scrollbar if necessary, e.g. if content is too tall to fit in the container */
 		max-width: 100%; /* Ensure this box doesn't exceed its parent's width */
 		height: 100%; /* If you want a specific height, replace 100% with your value */
+		width: 100%; /* Add this line */
 	}
 </style>
